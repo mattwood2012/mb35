@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Moving Beyond 3.5</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <style>
+            .title {
+                font-size: 28px;
+                font-weight: bold;
+                padding: 5px;
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .sub-title {
+                font-size: 22px;
+                font-weight: bold;
+                padding: 5px;
+                margin-top: 14px;
+                text-align: center;
+            }
+
+            .clinic-description {
+                font-size: 14px;
+                font-weight: bold;
+                padding: 5px;
+                text-align: center;
+                margin-bottom: 34px; 
+            }
+
+            .link {
+                color: white;
+                font-size: 18px;
+                padding: .5em .5em;
+            }
+
+            .linkButton {
+                font-size: 18px;
+                padding: 5px;
+                margin: 10px;
+                background-color: red;
+                color: white;
+                border-color: red;
+            }
+        </style>
+        <script>
+            const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            const clinicDescriptions = [
+                "Clinic #1 - Introduction and Serve Basics",
+                "Clinic #2 - The 5 P's and Dinking Basics",
+                "Clinic #3 - Playing in Control and Return of Serve Basics",
+                "Clinic #4 - Playing the Percentages and Controlled Dinking",
+                "Clinic #5 - Playing Calm, Basic Third Shot Drops and Third Shot Drives",
+                "Clinic #6 - Straight Ahead Dinking and Basic Fourth/Fifth Shots",
+                "Clinic #7 - Grip/Paddle Weighting/Overwrap and Right/Left Cross Court Dinking"
+            ];
+
+            const oneWeekMS = 7 * 24 * 60 * 60 * 1000;
+
+            const knownClinicYear = 2025;
+            const knownClinicMonth = 9;      // Note month index is zero based
+            const knownClinicDay = 22;
+
+            const knownLessonIndex = 3;      // Note lesson index is zero based
+
+            window.onload = function() {
+                console.log("Test date functions");
+
+                // Convert last known clinic date to epoch milliSeconds 
+                let knownClinicDate = new Date(knownClinicYear, knownClinicMonth, knownClinicDay, 12)
+                let clinicDateMS = knownClinicDate.valueOf();
+
+                // Get current date in epoch milliSeconds
+                let nowMS = Date.now();
+
+                // Test Code!
+                // nowMS = clinicDateMS + 4 * oneWeekMS - (3600000)
+
+                let lessonIndex = knownLessonIndex;
+
+                // If date is before know clinic date use clinicDateMS otherwise add a week to clinicDateMS, increment lessonIndex and try again
+                while (nowMS > clinicDateMS) {
+                    clinicDateMS += oneWeekMS;
+                    lessonIndex++;
+                }
+
+                // convert milliSeconds date to regular date and display
+                let nextClinicDate = new Date(clinicDateMS);
+
+                let dayStr = nextClinicDate.getDay();
+
+                // Build clinic date string and display
+                let dateString = `${dayName[nextClinicDate.getDay()]} ${monthName[nextClinicDate.getMonth()]} `;
+                dateString = dateString + `${nextClinicDate.getDate()} ${nextClinicDate.getFullYear()}`;
+                document.getElementById("clinicDate").textContent=dateString;
+
+                // Get clinic description and display
+                let descriptionString = clinicDescriptions[lessonIndex % clinicDescriptions.length];
+                document.getElementById("clinicDescription").textContent=descriptionString;
+
+            };            
+        </script>    
+    </head>
+
+    <body>
+
+        <div class="title">Moving Beyond 3.5</div>
+        <div class="sub-title"  id="clinicDate"></div>
+        <div class="clinic-description" id="clinicDescription"></div>
+
+        <div><button  class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button></div>
+        <div><button  class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button></div>
+        <div><button  class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
+        <div><button  class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
+
+
+    </body>
+</html>
