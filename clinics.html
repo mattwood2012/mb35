@@ -27,9 +27,9 @@
                 margin: 0 auto;
                 font-size: 18px;
                 padding: 5px;
-                background-color: red;
+                background-color: blue;
                 color: white;
-                border-color: red;
+                border-color: blue;
             }
         </style>
 
@@ -46,13 +46,11 @@
             ];
 
             window.onload = function() {
-                console.log("Some code");
 
                 for (let index = 0; index < lastClinicDescriptions.length; index++) {
                     document.getElementById("clinic" + index).textContent=lastClinicDescriptions[index];
                 }
 
-                console.log("Some more code");
             };            
         </script>    
 
@@ -71,16 +69,6 @@
         <p id="clinic5"></p>
         <p id="clinic6"></p>
         
-        <!--
-        <p>Clinic #1 - Introduction and Serve Basics</p>
-        <p>Clinic #2 - The 5 P's and Dinking Basics</p>
-        <p>Clinic #3 - Playing in Control and Return of Serve Basics</p>
-        <p>Clinic #4 - Playing the Percentages and Controlled Dinking</p>
-        <p>Clinic #5 - Playing Calm, Basic Third Shot Drops and Third Shot Drives</p>
-        <p>Clinic #6 - Straight Ahead Dinking and Basic Fourth/Fifth Shots</p>
-        <p>Clinic #7 - Grip/Paddle Weighting/Overwrap and Right/Left Cross Court Dinking</p>
-        -->
-
         <button onclick="document.location='./index.html'" class="goHomeButton">Back to the Main page</button>
     </body>
 </html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -45,6 +44,32 @@
                 color: white;
                 border-color: red;
             }
+            
+            .goToPCVGButton {
+                text-align: center;
+                font-size: 18px;
+                padding: 5px;
+                margin: 10px;
+                background-color: blue;
+                color: white;
+                border-color: blue;
+            }
+
+            .goHomeButton {
+                font-size: 18px;
+                padding: 5px;
+                margin: 10px;
+                background-color: red;
+                color: white;
+                border-color: red;
+            }
+
+            .center {
+            display: flex;
+            justify-content: center; /* Horizontal alignment */
+            align-items: center;
+            }
+
         </style>
         <script>
             const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -112,11 +137,13 @@
         <div class="sub-title"  id="clinicDate"></div>
         <div class="clinic-description" id="clinicDescription"></div>
 
-        <div><button  class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button></div>
-        <div><button  class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button></div>
-        <div><button  class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
-        <div><button  class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
+        <div><button class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button></div>
+        <div><button class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button></div>
+        <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
+        <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
 
+        <div class="center"><button class="goToPCVGButton" onclick="document.location='./redirect.html'">Go Back to PCVG Clinics</button></div>
+        <!--<div><a  href="https:%2F%2Fwww.pickleballcommunity.com%2Finstructional-program%2Fclinic-series'"><button class="goToPCVGButton">Go Back to PCVG Clinics</button></a></div>-->
 
     </body>
 </html>
