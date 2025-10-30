@@ -127,7 +127,15 @@
                 let descriptionString = clinicDescriptions[lessonIndex % clinicDescriptions.length];
                 document.getElementById("clinicDescription").textContent=descriptionString;
 
-            };            
+            };
+
+            function handleBack() {
+            let hist = history.state;
+            let len = history.length;
+            let x = history;
+            let stateIsNull = (hist == null);
+            history.go(-1);
+            }
         </script>    
     </head>
 
@@ -142,7 +150,7 @@
         <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
         <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
 
-        <div class="center"><button class="goToPCVGButton" onclick="document.location='./redirect.html'">Go Back to PCVG Clinics</button></div>
+        <div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to PCVG Clinics</button></div>
         <!--<div><a  href="https:%2F%2Fwww.pickleballcommunity.com%2Finstructional-program%2Fclinic-series'"><button class="goToPCVGButton">Go Back to PCVG Clinics</button></a></div>-->
 
     </body>
