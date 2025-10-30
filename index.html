@@ -93,8 +93,6 @@
             const knownLessonIndex = 3;      // Note lesson index is zero based
 
             window.onload = function() {
-                console.log("Test date functions");
-
                 // Convert last known clinic date to epoch milliSeconds 
                 let knownClinicDate = new Date(knownClinicYear, knownClinicMonth, knownClinicDay, 12)
                 let clinicDateMS = knownClinicDate.valueOf();
@@ -130,11 +128,8 @@
             };
 
             function handleBack() {
-            let hist = history.state;
-            let len = history.length;
-            let x = history;
-            let stateIsNull = (hist == null);
-            history.go(-1);
+                if (history.length > 0)
+                    history.go(-1);
             }
         </script>    
     </head>
@@ -150,8 +145,7 @@
         <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
         <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
 
-        <div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to PCVG Clinics</button></div>
-        <!--<div><a  href="https:%2F%2Fwww.pickleballcommunity.com%2Finstructional-program%2Fclinic-series'"><button class="goToPCVGButton">Go Back to PCVG Clinics</button></a></div>-->
+        <div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to Clinic Signup</button></div>
 
     </body>
 </html>
