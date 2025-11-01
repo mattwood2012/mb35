@@ -93,7 +93,6 @@
             const knownLessonIndex = 3;      // Note lesson index is zero based
 
             window.onload = function() {
-            alert("history.length: " + history.length);
                 // Convert last known clinic date to epoch milliSeconds 
                 let knownClinicDate = new Date(knownClinicYear, knownClinicMonth, knownClinicDay, 12)
                 let clinicDateMS = knownClinicDate.valueOf();
@@ -109,14 +108,14 @@
                     lessonIndex++;
                 }
 
-                // convert milliSeconds date to regular date and display
+                // Convert milliSeconds date to regular date and display
                 let nextClinicDate = new Date(clinicDateMS);
 
                 let dayStr = nextClinicDate.getDay();
 
                 // Build clinic date string and display
                 let dateString = `${dayName[nextClinicDate.getDay()]} ${monthName[nextClinicDate.getMonth()]} `;
-                dateString = dateString + `${nextClinicDate.getDate()} ${nextClinicDate.getFullYear()}`;
+                dateString += `${nextClinicDate.getDate()} ${nextClinicDate.getFullYear()}`;
                 document.getElementById("clinicDate").textContent=dateString;
 
                 // Get clinic description and display
@@ -125,14 +124,6 @@
 
             };
 
-            function handleBack() {
-                let historyLength = history.length;
-                alert("history.length: " + history.length);
-                history.back();
-
-                //console.log("onload: " + (1-historyLength).toString())
-                //window.history.go(1-historyLength);
-            }
         </script>    
     </head>
 
@@ -147,9 +138,7 @@
         <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
         <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
 
-        <div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to Clinic Signup</button></div>
-        <!--<div class="center"><button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button></div>->>
-
+        <div class="center"><button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button></div>
 
     </body>
 </html>
