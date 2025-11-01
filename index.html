@@ -93,6 +93,7 @@
             const knownLessonIndex = 3;      // Note lesson index is zero based
 
             window.onload = function() {
+            alert("history.length: " + history.length);
                 // Convert last known clinic date to epoch milliSeconds 
                 let knownClinicDate = new Date(knownClinicYear, knownClinicMonth, knownClinicDay, 12)
                 let clinicDateMS = knownClinicDate.valueOf();
@@ -126,8 +127,11 @@
 
             function handleBack() {
                 let historyLength = history.length;
-                console.log("onload: " + (1-historyLength).toString())
-                window.history.go(1-historyLength);
+                alert("history.length: " + history.length);
+                history.back();
+
+                //console.log("onload: " + (1-historyLength).toString())
+                //window.history.go(1-historyLength);
             }
         </script>    
     </head>
@@ -143,7 +147,7 @@
         <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
         <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
 
-        <!--<div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to Clinic Signup</button></div>-->
+        <div class="center"><button class="goToPCVGButton" onclick="handleBack()">Go Back to Clinic Signup</button></div>
         <!--<div class="center"><button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button></div>->>
 
 
