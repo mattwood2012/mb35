@@ -1,15 +1,15 @@
 // Globals
-var chart;
 const maxPlayers = 3;
 const chartTitle = document.getElementById("title").innerText;
+const lineColors = ["rgb(255,0,0", "rgb(0,255,0", "rgb(0,0,255"];
+
+var ratingsHistoryText;
+var ratingsHistoryData;
+
+var chartDatasets = new Array();
+var chart;
 
 function handleOnLoad() {
-
-    //rankingsHistoryData = {
-    //    "Player 1": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
-    //    "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],
-    //    "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
-    //}
 
     rankingsHistoryData = {
         "Player 1": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
@@ -17,10 +17,80 @@ function handleOnLoad() {
         "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
     }
 
-    var lineColors = ["rgb(255,0,0", "rgb(0,255,0", "rgb(0,0,255"];
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            // Action to be performed when the document is read;
+            csv = xhttp.responseText;
+            rows = parseCSV(xhttp.responseText);
+            numRows = rows.length;
+            //let rHD = {};
 
-    var chartDatasets = new Array();
+            let y = 0;
+            let jStr = '{';
+            let j = 1;
 
+            for (let i = 1; i < numRows; i++) {
+                jStr += '"' + rows[i][0] + '":[';
+                for (j = 1; j < rows[i].length - 1; j++) {
+                    y = (rows[i])[j];
+                    if (y) {
+                        jStr += '{"x":' + j.toString() + ',"y":' + y.toString() + '}';
+                        if ((j < rows[i].length - 1) && (rows[i])[j+1]) {jStr += ',';}
+                    }
+                }
+                // Because we do 1 less than actual columns
+                if ((rows[i])[j]) {
+                        jStr += '{"x":' + j.toString() + ',"y":' + y.toString() + '}';
+                    }
+
+                jStr += ']';
+                if (i < (numRows - 1)) {jStr += ',';}
+
+            } 
+            jStr += '}';
+
+            console.log(jStr);
+            //ratingsHistoryText = '{"Player 9": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }], "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],"Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]}'
+            ratingsHistoryData = JSON.parse(jStr);
+
+
+
+/*             rankingsHistoryData = {
+                "Player 9": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
+                "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],
+                "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
+            }
+ */            
+            // Load player drop downs
+            // All players in alphabetically sorted order
+            var players = Object.keys(ratingsHistoryData);
+            players.sort();
+
+            for (var i = 0; i < maxPlayers; i++) {
+                var selectPlayer = document.getElementById("player" + i);
+
+                // Blank first line
+                let opt = document.createElement("option");
+                selectPlayer.appendChild(opt);
+
+                // Add all names after blank line
+                players.forEach(function (player) {
+                    let opt = document.createElement("option");
+                    opt.textContent = player;
+                    opt.value = player;
+                    selectPlayer.appendChild(opt);
+                })
+            }
+
+
+
+        }
+    };
+    xhttp.open("GET", "./Vipr_Player_Progressions_Wide.csv", true);
+    xhttp.send();
+
+  
     for (let i = 0; i < maxPlayers; i++) {
 
         const chartDataset = {
@@ -38,27 +108,6 @@ function handleOnLoad() {
         var newDataset = Object.create(chartDataset);
         chartDatasets.push(newDataset);
 
-    }
-
-    // Load player drop downs
-    // All players in alphabetically sorted order
-    var players = Object.keys(rankingsHistoryData);
-    players.sort();
-
-    for (var i = 0; i < maxPlayers; i++) {
-        var selectPlayer = document.getElementById("player" + i);
-
-        // Blank first line
-        let opt = document.createElement("option");
-        selectPlayer.appendChild(opt);
-
-        // Add all names after blank line
-        players.forEach(function (player) {
-            let opt = document.createElement("option");
-            opt.textContent = player;
-            opt.value = player;
-            selectPlayer.appendChild(opt);
-        })
     }
 
     var ctx = document.getElementById('myChart').getContext('2d');
@@ -115,12 +164,10 @@ function handlePlayerChange(playerNumber) {
     if (playerName != "") {
 
         // Create data array - deep copy - and make negative!
-        const dataArray = JSON.parse(JSON.stringify(rankingsHistoryData[playerName]));
-
-
-        //dataArray.forEach(function (point) {
-        //    point.y = -point.y;
-        //})
+        let rHDP = ratingsHistoryData[playerName];
+        let jsonString = JSON.stringify(rHDP);
+        const dA = JSON.parse(jsonString);
+        const dataArray = JSON.parse(JSON.stringify(ratingsHistoryData[playerName]));
 
         chartDataset = {
             label: playerName,
@@ -310,4 +357,45 @@ function handleCanvasClick(e) {
 //    var activePoints = chart.getElementsAtEvent(e);
 //    var meta = chart.getDatasetMeta(0);
 //    var ds = chart.data.datasets[0]; // use index not 0!
+}
+
+// Simple CSV parser (supports quoted fields)
+function parseCSV(text) {
+    const rows = [];
+    let current = '';
+    let row = [];
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+
+        if (char === '"' && inQuotes && nextChar === '"') {
+            // Escaped quote
+            current += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            row.push(current);
+            current = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (current || row.length > 0) {
+                row.push(current);
+                rows.push(row);
+                row = [];
+                current = '';
+            }
+        } else {
+            current += char;
+        }
+    }
+
+    // Add last value if exists
+    if (current || row.length > 0) {
+        row.push(current);
+        rows.push(row);
+    }
+
+    return rows;
 }
