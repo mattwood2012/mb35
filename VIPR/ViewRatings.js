@@ -11,11 +11,11 @@ var chart;
 
 function handleOnLoad() {
 
-    rankingsHistoryData = {
-        "Player 1": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
-        "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],
-        "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
-    }
+    // rankingsHistoryData = {
+    //     "Player 1": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
+    //     "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],
+    //     "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
+    // }
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -24,44 +24,26 @@ function handleOnLoad() {
             csv = xhttp.responseText;
             rows = parseCSV(xhttp.responseText);
             numRows = rows.length;
-            //let rHD = {};
-
-            let y = 0;
-            let jStr = '{';
-            let j = 1;
+            
+            ratingsHistoryData = {};
 
             for (let i = 1; i < numRows; i++) {
-                jStr += '"' + rows[i][0] + '":[';
-                for (j = 1; j < rows[i].length - 1; j++) {
-                    y = (rows[i])[j];
-                    if (y) {
-                        jStr += '{"x":' + j.toString() + ',"y":' + y.toString() + '}';
-                        if ((j < rows[i].length - 1) && (rows[i])[j+1]) {jStr += ',';}
+                let name = (rows[i])[0];
+                let points = [];
+                for (let j=0; j < rows[i].length; j++){
+                    let y = (rows[i])[j+1]
+                    if (y){
+                        let point = {};
+                        point.x = j;
+                        point.y = y;
+                        points.push(point)
                     }
                 }
-                // Because we do 1 less than actual columns
-                if ((rows[i])[j]) {
-                        jStr += '{"x":' + j.toString() + ',"y":' + y.toString() + '}';
-                    }
-
-                jStr += ']';
-                if (i < (numRows - 1)) {jStr += ',';}
-
-            } 
-            jStr += '}';
-
-            console.log(jStr);
-            //ratingsHistoryText = '{"Player 9": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }], "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],"Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]}'
-            ratingsHistoryData = JSON.parse(jStr);
-
-
-
-/*             rankingsHistoryData = {
-                "Player 9": [{ "x": 1, "y": 1 }, { "x": 2, "y": 2 }, { "x": 3, "y": 3 }],
-                "Player 2": [{ "x": 1, "y": 3 }, { "x": 2, "y": 2 }, { "x": 3, "y": 1 }],
-                "Player 3": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }, { "x": 3, "y": 2 }]
+                
+                ratingsHistoryData[name] = points;
             }
- */            
+
+           
             // Load player drop downs
             // All players in alphabetically sorted order
             var players = Object.keys(ratingsHistoryData);
@@ -113,7 +95,7 @@ function handleOnLoad() {
     var ctx = document.getElementById('myChart').getContext('2d');
 
     var ttcb = function toolTipCallback(tooltipItem, data) {
-        return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + Math.abs(tooltipItem.value);
+        return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + tooltipItem.value;
     }
 
     chart = new Chart(ctx, {
@@ -130,11 +112,11 @@ function handleOnLoad() {
             legend: { display: true, labels: { boxWidth: 12 } },
             scales: {
                 yAxes: [{
-                    ticks: {
-                        callback: function (value, index, values) {
-                            return Math.abs(value);
-                        }
-                    },
+                    // ticks: {
+                    //     callback: function (value, index, values) {
+                    //         return Math.abs(value);
+                    //     }
+                    // },
                     scaleLabel: {
                         display: true,
                         labelString: "VIPR Rating",
@@ -164,10 +146,10 @@ function handlePlayerChange(playerNumber) {
     if (playerName != "") {
 
         // Create data array - deep copy - and make negative!
-        let rHDP = ratingsHistoryData[playerName];
-        let jsonString = JSON.stringify(rHDP);
-        const dA = JSON.parse(jsonString);
-        const dataArray = JSON.parse(JSON.stringify(ratingsHistoryData[playerName]));
+        // let rHDP = ratingsHistoryData[playerName];
+        // let jsonString = JSON.stringify(rHDP);
+        // const dA = JSON.parse(jsonString);
+        // const dataArray = JSON.parse(JSON.stringify(ratingsHistoryData[playerName]));
 
         chartDataset = {
             label: playerName,
@@ -178,7 +160,7 @@ function handlePlayerChange(playerNumber) {
             pointRadius: 4,
             borderColor: lineColors[playerNumber],
             pointBackgroundColor: lineColors[playerNumber],
-            data: dataArray
+            data: ratingsHistoryData[playerName] //dataArray
         };
     }
     else {
@@ -201,9 +183,9 @@ function handlePlayerChange(playerNumber) {
     chart.update();
 }
 
-var ytcb = function yTicksCallback(value) {
-    return Math.abs(value);
-}
+// var ytcb = function yTicksCallback(value) {
+//     return Math.abs(value);
+// }
 
 function handleManualYscaleClick() {
 
@@ -212,10 +194,12 @@ function handleManualYscaleClick() {
 
     if (isManualYscale) {
 
-        var yfrom = -Number(document.getElementById("yfrom").value);
-        var yto =- Number(document.getElementById("yto").value);
+        //var yfrom = -Number(document.getElementById("yfrom").value);
+        //var yto =- Number(document.getElementById("yto").value);
+        var yfrom = Number(document.getElementById("yfrom").value);
+        var yto = Number(document.getElementById("yto").value);
 
-        if (yfrom < yto) {
+        if (yfrom > yto) {
             var temp = yfrom;
             yfrom = yto;
             yto = temp;
@@ -228,7 +212,7 @@ function handleManualYscaleClick() {
             scales: {
                 yAxes: [{
                     ticks: {
-                        min: yfrom, max: yto, callback: function (value, index, values) { return Math.abs(value); }
+                        min: yfrom, max: yto //, callback: function (value, index, values) { return Math.abs(value); }
                     },
                     scaleLabel: {
                         display: true,
@@ -254,7 +238,7 @@ function handleManualYscaleClick() {
             legend: { display: true, labels: { boxWidth: 12 } },
             scales: {
                 yAxes: [{
-                    ticks: { callback: function (value, index, values) { return Math.abs(value); } },
+                    //ticks: { callback: function (value, index, values) { return Math.abs(value); } },
                     scaleLabel: {
                         display: true,
                         labelString: "Ranking",
@@ -310,10 +294,10 @@ function handleYfromYtoInput() {
     // Only run if in manual Y scale mode
     if (document.getElementById("manualYscale").checked) { 
 
-        var yfrom = -Number(document.getElementById("yfrom").value);
-        var yto = -Number(document.getElementById("yto").value);
+        var yfrom = Number(document.getElementById("yfrom").value);
+        var yto = Number(document.getElementById("yto").value);
 
-        if (yfrom < yto) {
+        if (yfrom > yto) {
             var temp = yfrom;
             yfrom = yto;
             yto = temp;
