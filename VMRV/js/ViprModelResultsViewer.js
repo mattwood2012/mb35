@@ -1,8 +1,12 @@
 // Globals
-var infos = ["crf0","crf25", "crf50", "crf75", "crf100"];
-const baseFilename = "data/Vipr_Player_Progressions_Wide";
-const allRatings = {};
-const csvResults = {};
+"use strict";
+
+// control dial settings - think of a better name! 
+var infos = ["crf0","crf25", "crf50", "crf75", "crf100"]; 
+const baseFilename = "data/ViprAlgoResults";
+const allResults = {};
+const nameLookup = {};
+const contexts = {};
 
 const chartTitle = document.getElementById("title").innerText;
 const lineColors = ["rgb(255,0,0", "rgb(0,255,0", "rgb(0,0,255", "rgb(127,127,127", "rgb(0,0,0", "rgb(0,255,255"];
@@ -14,72 +18,51 @@ var infoIndex = 0;
 var chartDatasets = new Array();
 var chart;
 
-function handleOnLoad() {
+async function handleOnLoad() {
     // Use url query string, if present, to specify files
     let search = window.location.search;
     if (search) {
-        //let s1 = search.substring(7);
-        let s2 = (search.split("=",))[1];
-        infos = s2.split(",");
+        let filenameEnding = (search.split("=",))[1];
+        infos = filenameEnding.split(",");
     }
 
-    infos.forEach((info) => {
-        const fileName = baseFilename + "_" + info + ".csv";
-        const request = new XMLHttpRequest();
-        request.open('GET', fileName, true);
-        request.responseType = '';
-        
-        
-        request.onload = function() {
-            if (request.status === 200) {
-                csvResults[info] = request.responseText;
+    // ***** Tempory until UId and name are in data/ViprAlgoResults.json *****
+    // First read document that has mail to name data and create lookup
+    let response = await fetch("data/Vipr_Player_Progressions_Wide.json");
+    let json = await response.text();
+    let lookupInfo = JSON.parse(json);
 
-                if (++infoIndex == infos.length){
-                    initialize();
-                }
-            }
-        };
+    lookupInfo.forEach((playerRatingHistory) => {
+        nameLookup[playerRatingHistory.email] = playerRatingHistory.PlayerName;
+    })
+    
 
-        request.send();
-    });
+    // Load the ViprAlgoResults_xxx.json into contexts
+    for (let i=0; i<infos.length; i++) {
+        let info = infos[i];
+        let fileName = baseFilename + "_" + info + ".json";
 
-}
+        // Get one set (ViprAlgoResults_info.json) of ViprAlgoResults
+        response = await fetch(fileName);
+        let jsonResults = await response.text();
+        let algoResults = JSON.parse(jsonResults);
 
-function initialize(){
+        // Temp until ViprAlgoResults.json comes with player names
+        algoResults.forEach((ar) => {
+            ar["visitor1_name"] = nameLookup[ar["visitor_player1_email"]];
+            ar["visitor2_name"] = nameLookup[ar["visitor_player2_email"]];
+            ar["home1_name"] = nameLookup[ar["home_player1_email"]];
+            ar["home2_name"] = nameLookup[ar["home_player2_email"]];
+        })
 
-    // First load csv formatted for chart.js into allRatingsHistory that has a property of "model description" (e.g. crf25) for each model
-    for (let infoIndex=0; infoIndex<infos.length; infoIndex++) {
-        csv = csvResults[infos[infoIndex]]
-        rows = parseCSV(csv);
-        numRows = rows.length;
-        
-        const ratingsHistoryData = {};
+        allResults[info] = algoResults;
+    };
 
-        for (let i = 1; i < numRows; i++) {
-            let name = (rows[i])[1];
-            let points = [];
-            for (let j=2; j < rows[i].length; j++){
-                let y = (rows[i])[j]
-                if (y){
-                    let point = {};
-                    point.x = j-1;
-                    point.y = y;
-                    points.push(point)
-                }
-            }
-            
-            ratingsHistoryData[name] = points;
-        }
-        allRatingsHistory[infos[infoIndex]] = ratingsHistoryData;
-
-    }
-
-    // Get all players in alphabetically sorted order
-    // All models have the same players so just use first model
-    var players = Object.keys(allRatingsHistory[infos[0]]);
+    // Load player drop down
+    // All players in alphabetically sorted order
+    let players = Object.values(nameLookup)//Object.keys(ratingsHistoryData);
     players.sort();
 
-    // Load player drop down 
     var selectPlayer = document.getElementById("player0");
 
     // Blank first line
@@ -93,12 +76,12 @@ function initialize(){
         opt.value = player;
         selectPlayer.appendChild(opt);
     })
-
-    // Initialize chart for each model
-    for (let i = 0; i < infos.length; i++) {
+    
+    // Create starting chart dataset for each set of results
+    for (let i=0; i<infos.length; i++) {
 
         const chartDataset = {
-            label: "Not Set",
+            label: infos[i],
             fill: false,
             showLine: true,
             steppedLine: true,
@@ -108,15 +91,51 @@ function initialize(){
             pointBackgroundColor: lineColors[i],
             data: [{ x: null, y: null }]
         }
-
-        var newDataset = Object.create(chartDataset);
+ 
+        let newDataset = Object.create(chartDataset);
         chartDatasets.push(newDataset);
-    }
+   }
 
     var ctx = document.getElementById('myChart').getContext('2d');
 
     var ttcb = function toolTipCallback(tooltipItem, data) {
-        return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + tooltipItem.value;
+
+        let tIDsi = tooltipItem.datasetIndex;
+        let  playerName= document.getElementById("player0").value;
+        let infoName = (data.datasets[tIDsi]).label;
+        let xPointIndex = tooltipItem.xLabel-1;
+        let context = (contexts[infoName])[xPointIndex];
+        let deltaRating = 0;
+        let score = "";
+
+        //let context = algoResults[contextIndex];
+
+        console.log(JSON.stringify(context, null, 2));
+
+        // Add partner and opponents names to tooltip
+        let players = " with ";
+        if (playerName == context.home1_name) {
+            players += context.home2_name + " vs " + context.visitor1_name + " and " + context.visitor2_name ;
+            deltaRating = context.home_player1_rating_final - context.home_player1_rating_initial
+            score = String(context.home_points) + "-" + String(context.visitor_points);
+        } else if (playerName == context.home2_name) {
+            players += context.home1_name + " vs " + context.visitor1_name + " and " + context.visitor2_name;
+            deltaRating = context.home_player2_rating_final - context.home_player2_rating_initial
+            score = String(context.home_points) + "-" + String(context.visitor_points);
+        } else if (playerName == context.visitor1_name) {
+            players += context.visitor2_name + " vs " + context.home1_name + " and " + context.home2_name;
+            deltaRating = context.visitor_player1_rating_final - context.visitor_player1_rating_initial
+            score = String(context.visitor_points) + "-" + String(context.home_points);
+        } else {
+            players += context.visitor1_name + " vs " + context.home1_name + " and " + context.home2_name
+            deltaRating = context.visitor_player2_rating_final - context.visitor_player2_rating_initial
+            score = String(context.visitor_points) + "-" + String(context.home_points);
+        };
+
+        return infoName + " " + context["match_date"] + " Game " + context["game_number"] + " (" + score + ")" + players + " " + " \u0394: " + deltaRating.toFixed(3);
+
+
+        //return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + tooltipItem.value;
     }    
 
     // Finally create the chart
@@ -155,20 +174,55 @@ function initialize(){
         }
     })
 
-    //document.getElementById("myChart").onclick = handleCanvasClick;
-
     chart.update();
 
 }
 
+// Change the data being charted when selected playere name changes
 function handlePlayerChange(playerNumber) {
-    var playerName = document.getElementById("player" + playerNumber).value;
+    var playerName = document.getElementById("player0").value;
 
-    // Create a ChartDataset for each model
+    let y;
+
+    // const start = performance.now();
+    // Code to measure
+    // Create a ChartDataset for each model (i.e. different control dial settings)
     for (let modelIndex=0; modelIndex<infos.length; modelIndex++) {
         if (playerName != "") {
 
+            const dataArray = [];
+            const contextArray = [];
+            let x = 1;
+
+            let algoResults = allResults[infos[modelIndex]];
+
+            // Build context and data arrays
+            for (let i = 0; i < Object.keys(algoResults).length; i++){
+
+                if ((algoResults[i])["visitor1_name"] == playerName) {
+                    y = (algoResults[i])["visitor_player1_rating_final"];
+                } else if ((algoResults[i])["visitor2_name"] == playerName) {
+                    y = (algoResults[i])["visitor_player2_rating_final"];
+                } else if ((algoResults[i])["home1_name"] == playerName) {
+                    y = (algoResults[i])["home_player1_rating_final"];}
+                else if ((algoResults[i])["home2_name"] == playerName) {
+                    y = (algoResults[i])["home_player2_rating_final"];
+                } else {
+                    y = null;
+                }
+
+                if (y) {
+                    dataArray.push({"x" : x++, "y": y});
+
+                    contextArray.push(algoResults[i]);
+                };
+            }
+
+            contexts[infos[modelIndex]] = contextArray;
+
+
             const chartDataset = {
+                // all except data set in handleOnLoad
                 label: infos[modelIndex],
                 fill: false,
                 showLine: true,
@@ -177,14 +231,14 @@ function handlePlayerChange(playerNumber) {
                 pointRadius: 4,
                 borderColor: lineColors[modelIndex],
                 pointBackgroundColor: lineColors[modelIndex],
-                data: (allRatingsHistory[infos[modelIndex]])[playerName]
+                data: dataArray
             };
             chart.data.datasets[modelIndex] = chartDataset;
         }
         else {
 
             const chartDataset = {
-                label: "Not Set",
+                label: infos[modelIndex],
                 fill: false,
                 showLine: true,
                 steppedLine: document.getElementById("stepped").checked,
@@ -197,6 +251,12 @@ function handlePlayerChange(playerNumber) {
             chart.data.datasets[modelIndex] = chartDataset;
         }
     }
+
+    
+// const end = performance.now();
+// console.log(`Execution time: ${end - start} ms`);
+
+
 
     //chart.data.datasets[playerNumber] = chartDataset;
 
@@ -234,7 +294,7 @@ function handleManualYscaleClick() {
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: "Ranking",
+                        labelString: "VIPR Rating",
                     }
                 }],
                 xAxes: [{
