@@ -13,6 +13,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script src="js/ViewRatings.js"></script>
     <!--<script src="./DinkingRankingsHistory.json"></script>-->
+  <style>
+
+    .container {
+      display: grid;
+      grid-template-columns: 0.8fr 2fr repeat(4, 1fr);
+      gap: 2px;
+      background-color: aliceblue;
+      width: 480px;
+      /* position: absolute;
+      pointer-events:  none; */
+    }
+
+    .name_holder {
+      text-align: right;
+      padding-right: 10px;
+    }
+
+    .data_holder {
+      text-align: center;
+    }
+
+    .full_row {
+      grid-column-start: 1;
+      grid-column-end: 7;
+      text-align: center;
+      padding: 3px;
+    }
+
+    .visitors-score {
+      grid-row: 3 / 5;
+      grid-column: 6 / 7;
+      text-align: center;
+      padding-top: 10px;
+    }
+
+    .home-score {
+      grid-row: 5 / 7;
+      grid-column: 6 / 7;
+      text-align: center;
+      padding-top: 10px;
+    }
+
+  </style>
+
 
 </head>
 
@@ -99,5 +143,6 @@
         <canvas id="myChart"></canvas>
     </div>
 
+    <div class="container" id="tooltip"></div>
 </body>
 </html>

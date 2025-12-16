@@ -9,23 +9,25 @@ var ratingsHistoryText;
 var ratingsHistoryData;
 
 var algoResults;
+var ctcb;   // Custom Tooltip Call Back
 
 const contexts = {};
 
 const nameLookup = {};
 
-var chartDatasets = new Array();
+var chartDatasets = [];
 var chart;
 
 async function handleOnLoad() {
 
     // First read document that has mail to name data and create lookup
+    //let response = await fetch("data/Vipr_Player_Progressions_Wide.json");
     let response = await fetch("data/Vipr_Player_Progressions_Wide.json");
     let json = await response.text();
     let lookupInfo = JSON.parse(json);
 
-    lookupInfo.forEach((info) => {
-        nameLookup[info.email] = info.PlayerName;
+    lookupInfo.forEach((playerRatingHistory) => {
+        nameLookup[playerRatingHistory.email] = playerRatingHistory.PlayerName;
     })
     
     // Read context associated with each game (players names, before and after ratings etc.)
@@ -37,36 +39,8 @@ async function handleOnLoad() {
     
     algoResults = JSON.parse(jsonResults);
     
-    //const result = heavyComputation();
-    const end = performance.now();   // High-resolution end time
-
+    //const end = performance.now();   // High-resolution end time
     //console.log(`JSON Execution time: ${(end - start).toFixed(3)} ms`);
-
-    // // Get csv format ratings into a form that a chart.js scatter chart accepts
-    // rows = parseCSV(csv);
-    // numRows = rows.length;
-    
-    // ratingsHistoryData = {};
-
-    // for (let i = 1; i < numRows; i++) {
-    //     // Build lookup of names from unique id (email)
-    //     nameLookup[(rows[i])[0]] = (rows[i])[1];
-
-    //     //Build rating data array for this name/id
-    //     let name = (rows[i])[1];
-    //     let points = [];
-    //     for (let j=2; j < rows[i].length; j++){
-    //         let y = (rows[i])[j]
-    //         if (y){
-    //             let point = {};
-    //             point.x = j-1;
-    //             point.y = y;
-    //             points.push(point)
-    //         }
-    //     }
-        
-    //     ratingsHistoryData[name] = points;
-    // }
 
     // Update algoResults to have visitor1_name, visitor2_name, home1_name, home2_name properties
     algoResults.forEach((ar) => {
@@ -155,15 +129,124 @@ async function handleOnLoad() {
         //return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + tooltipItem.value;
     }
 
+    ctcb = function (tooltipModel) {
+
+    // Get tooltip Element
+    var tooltipEl = document.getElementById('tooltip');
+
+    // Hide if no tooltip
+    if (tooltipModel.opacity === 0) {
+        tooltipEl.style.opacity = 0;
+        return;
+    }
+
+    // Set caret Position
+    tooltipEl.classList.remove('above', 'below', 'no-transform');
+    if (tooltipModel.yAlign) {
+        tooltipEl.classList.add(tooltipModel.yAlign);
+    } else {
+        tooltipEl.classList.add('no-transform');
+    }
+
+    function getBody(bodyItem) {
+        return bodyItem.lines;
+    }
+
+    // Set Text
+    // if (tooltipModel.body) {
+    //     var titleLines = tooltipModel.title || [];
+    //     var bodyLines = tooltipModel.body.map(getBody);
+
+    //     var innerHtml = '<thead>';
+
+    //     titleLines.forEach(function(title) {
+    //         innerHtml += '<tr><th>' + title + '</th></tr>';
+    //     });
+    //     innerHtml += '</thead><tbody>';
+
+    //     bodyLines.forEach(function(body, i) {
+    //         var colors = tooltipModel.labelColors[i];
+    //         var style = 'background:' + colors.backgroundColor;
+    //         style += '; border-color:' + colors.borderColor;
+    //         style += '; border-width: 2px';
+    //         var span = '<span style="' + style + '"></span>';
+    //         innerHtml += '<tr><td>' + span + body + '</td></tr>';
+    //     });
+    //     innerHtml += '</tbody>';
+
+    //     var tableRoot = tooltipEl.querySelector('table');
+    //     tableRoot.innerHTML = innerHtml;
+    // }
+
+
+    // <div class="container">
+    // </div>`;
+
+let innerHTML = `
+
+    <div class="full_row">Date: 2025-10-06, Match: 3-M001, Game: 1</div>
+    <div></div>
+
+      <div class="name_holder">Players</div>
+      <div class="data_holder">Before</div>
+      <div class="data_holder">After</div>
+      <div class="data_holder">Delta</div>
+      <div class="data_holder">Score</div>
+
+      <div class="name_holder">Visitor&nbsp;1:</div>
+      <div class="name_holder">Mark&nbsp;Attwood</div>
+      <div class="data_holder">4.567</div>
+      <div class="data_holder">4.678</div>
+      <div class="data_holder">0.111</div>
+
+      <div class="name_holder">Visitor&nbsp;2:</div>
+      <div class="name_holder">Jim&nbsp;Doran</div>
+      <div class="data_holder">6.543</div>
+      <div class="data_holder">6.654</div>
+      <div class="data_holder">0.111</div>
+      <div class="visitors-score">11</div>
+
+      <div class="name_holder">Home&nbsp;1:</div>
+      <div class="name_holder">John&nbsp;Doe</div>
+      <div class="data_holder">4.234</div>
+      <div class="data_holder">4.123</div>
+      <div class="data_holder">-0.111</div>
+
+      <div class="name_holder">Home&nbsp;2:</div>
+      <div class="name_holder">Ben&nbsp;Johns</div>
+      <div class="data_holder">3.000</div>
+      <div class="data_holder">2.889</div>
+      <div class="data_holder">-0.111</div>
+      <div class="home-score">8</div>
+
+      <div class="full_row">crf: 0.0, scale: 0.1, curve: 2.0, algo_type: Elo</div>`;
+
+
+        //var tooltipDiv = tooltipEl.querySelector('div');
+        tooltipEl.innerHTML = innerHTML;
+
+    // `this` will be the overall tooltip
+    var position = this._chart.canvas.getBoundingClientRect();
+
+    // Display, position, and set styles for font
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+    tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+    tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+    tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
+    tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+    tooltipEl.style.padding = tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
+    tooltipEl.style.pointerEvents = 'none';
+    
+}
     chart = new Chart(ctx, {
         type: "scatter",
         data: { datasets: chartDatasets },
         options: {
             //tooltips: { enabled: true, custom: function (tooltipModel) { var ttm = tooltipModel; } },
             title: { display: true, text: document.getElementById("title").innerText },
-            tooltips: {
-                enabled: true, callbacks: { label: ttcb } },
-
+            tooltips: { enabled: false, custom: ctcb },
             animation: { duration: 0 },
             maintainAspectRatio: false,
             legend: { display: true, labels: { boxWidth: 12 } },
@@ -190,8 +273,6 @@ async function handleOnLoad() {
         }
     })
 
-    //document.getElementById("myChart").onclick = handleCanvasClick;
-
     chart.update();
 }
 
@@ -200,10 +281,10 @@ function handlePlayerChange(playerNumber) {
     var playerName = document.getElementById("player" + playerNumber).value;
     var lineColors = ["rgb(255,0,0", "rgb(0,255,0", "rgb(0,0,255"];
     var chartDataset;
+    let x = 1;
     let y;
     let dataArray = [];
     let contextArray = [];
-    let x = 1;
 
     if (playerName != "") {
 
@@ -228,9 +309,10 @@ function handlePlayerChange(playerNumber) {
                 contextArray.push(algoResults[i]);
             };
 
-            contexts[playerName] = contextArray;
+            //contexts[playerName] = contextArray;
 
         }
+            contexts[playerName] = contextArray;
 
         chartDataset = {
             label: playerName,
@@ -264,10 +346,6 @@ function handlePlayerChange(playerNumber) {
     chart.update();
 }
 
-// var ytcb = function yTicksCallback(value) {
-//     return Math.abs(value);
-// }
-
 function handleManualYscaleClick() {
 
     var chartOptions;
@@ -275,8 +353,6 @@ function handleManualYscaleClick() {
 
     if (isManualYscale) {
 
-        //var yfrom = -Number(document.getElementById("yfrom").value);
-        //var yto =- Number(document.getElementById("yto").value);
         var yfrom = Number(document.getElementById("yfrom").value);
         var yto = Number(document.getElementById("yto").value);
 
@@ -290,6 +366,7 @@ function handleManualYscaleClick() {
             animation: { duration: 0 },
             maintainAspectRatio: false,
             legend: { display: true, labels: { boxWidth: 12 } },
+            tooltips: { enabled: false, custom: ctcb },
             scales: {
                 yAxes: [{
                     ticks: {
@@ -297,7 +374,7 @@ function handleManualYscaleClick() {
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: "Ranking",
+                        labelString: "VIPR Rating",
                     }
                 }],
                 xAxes: [{
@@ -317,12 +394,13 @@ function handleManualYscaleClick() {
             animation: { duration: 0 },
             maintainAspectRatio: false,
             legend: { display: true, labels: { boxWidth: 12 } },
+            tooltips: { enabled: false, custom: ctcb },
+
             scales: {
                 yAxes: [{
-                    //ticks: { callback: function (value, index, values) { return Math.abs(value); } },
                     scaleLabel: {
                         display: true,
-                        labelString: "Ranking",
+                        labelString: "VIPR Rating",
                     }
                 }],
                 xAxes: [{
@@ -384,10 +462,11 @@ function handleYfromYtoInput() {
             yto = temp;
         }
 
-        chartOptions = {
+        let chartOptions = {
             animation: { duration: 0 },
             maintainAspectRatio: false,
             legend: { display: true, labels: { boxWidth: 12 } },
+            tooltips: { enabled: false, custom: ctcb },
             scales: {
                 yAxes: [{
                     ticks: { min: yfrom, max: yto },
@@ -424,43 +503,43 @@ function handleCanvasClick(e) {
 //    var ds = chart.data.datasets[0]; // use index not 0!
 }
 
-// Simple CSV parser (supports quoted fields)
-function parseCSV(text) {
-    const rows = [];
-    let current = '';
-    let row = [];
-    let inQuotes = false;
+// // Simple CSV parser (supports quoted fields)
+// function parseCSV(text) {
+//     const rows = [];
+//     let current = '';
+//     let row = [];
+//     let inQuotes = false;
 
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const nextChar = text[i + 1];
+//     for (let i = 0; i < text.length; i++) {
+//         const char = text[i];
+//         const nextChar = text[i + 1];
 
-        if (char === '"' && inQuotes && nextChar === '"') {
-            // Escaped quote
-            current += '"';
-            i++;
-        } else if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            row.push(current);
-            current = '';
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            if (current || row.length > 0) {
-                row.push(current);
-                rows.push(row);
-                row = [];
-                current = '';
-            }
-        } else {
-            current += char;
-        }
-    }
+//         if (char === '"' && inQuotes && nextChar === '"') {
+//             // Escaped quote
+//             current += '"';
+//             i++;
+//         } else if (char === '"') {
+//             inQuotes = !inQuotes;
+//         } else if (char === ',' && !inQuotes) {
+//             row.push(current);
+//             current = '';
+//         } else if ((char === '\n' || char === '\r') && !inQuotes) {
+//             if (current || row.length > 0) {
+//                 row.push(current);
+//                 rows.push(row);
+//                 row = [];
+//                 current = '';
+//             }
+//         } else {
+//             current += char;
+//         }
+//     }
 
-    // Add last value if exists
-    if (current || row.length > 0) {
-        row.push(current);
-        rows.push(row);
-    }
+//     // Add last value if exists
+//     if (current || row.length > 0) {
+//         row.push(current);
+//         rows.push(row);
+//     }
 
-    return rows;
-}
+//     return rows;
+// }
