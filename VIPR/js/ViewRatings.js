@@ -18,45 +18,36 @@ const nameLookup = {};
 var chartDatasets = [];
 var chart;
 
+// Once all html/javascript/css has loaded execute the handleOnLoad() function
 async function handleOnLoad() {
 
-    // First read document that has mail to name data and create lookup
-    //let response = await fetch("data/Vipr_Player_Progressions_Wide.json");
-    let response = await fetch("data/Vipr_Player_Progressions_Wide.json");
-    let json = await response.text();
-    let lookupInfo = JSON.parse(json);
-
-    lookupInfo.forEach((playerRatingHistory) => {
-        nameLookup[playerRatingHistory.email] = playerRatingHistory.PlayerName;
-    })
-    
-    // Read context associated with each game (players names, before and after ratings etc.)
-    response = await fetch("data/ViprAlgoResults.json");
-    let jsonResults = await response.text();
-
-    // Get context information as an array of objects
-    // const start = performance.now(); // High-resolution start time
-    
-    algoResults = JSON.parse(jsonResults);
-    
+    //const start = performance.now();   // High-resolution start time
+    // Code to measure
     //const end = performance.now();   // High-resolution end time
     //console.log(`JSON Execution time: ${(end - start).toFixed(3)} ms`);
 
-    // Update algoResults to have visitor1_name, visitor2_name, home1_name, home2_name properties
+    // First read the results document (players names, before and after ratings etc.)
+    let resultsFilename = "ViprAlgoResults_mens.json";
+    let response = await fetch("data/" + resultsFilename);
+    let textResults = await response.text();
+    algoResults = JSON.parse(textResults);
+
+    // Create a lookup from player Uid to player name 
     algoResults.forEach((ar) => {
-        ar["visitor1_name"] = nameLookup[ar["visitor_player1_email"]];
-        ar["visitor2_name"] = nameLookup[ar["visitor_player2_email"]];
-        ar["home1_name"] = nameLookup[ar["home_player1_email"]];
-        ar["home2_name"] = nameLookup[ar["home_player2_email"]];
+
+        if (! nameLookup.visitor1_uid) { nameLookup[ar.visitor1_uid] = ar.visitor1_name}
+        if (! nameLookup.visitor2_uid) { nameLookup[ar.visitor2_uid] = ar.visitor2_name}
+        if (! nameLookup.home1_uid) { nameLookup[ar.home1_uid] = ar.home1_name}
+        if (! nameLookup.home2_uid) { nameLookup[ar.home2_uid] = ar.home2_name}
     })
     
     // Load player drop downs
-    // All players in alphabetically sorted order
+    // A blank line followed by all players in alphabetically sorted order
     let players = Object.values(nameLookup)//Object.keys(ratingsHistoryData);
     players.sort();
 
     for (var i = 0; i < maxPlayers; i++) {
-        var selectPlayer = document.getElementById("player" + i);
+        let selectPlayer = document.getElementById("player" + i);
 
         // Blank first line
         let opt = document.createElement("option");
@@ -71,6 +62,8 @@ async function handleOnLoad() {
         })
     }
 
+    // For each of the (3) possible chart lines create a blank Dataset
+    // This Dataset will be replaced when a player is selected from a "playerX" dropdown
     for (let i = 0; i < maxPlayers; i++) {
 
         const chartDataset = {
@@ -85,48 +78,9 @@ async function handleOnLoad() {
             data: [{ x: null, y: null }]
         }
 
-        var newDataset = Object.create(chartDataset);
+        let newDataset = Object.create(chartDataset);
         chartDatasets.push(newDataset);
 
-    }
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-
-    var ttcb = function toolTipCallback(tooltipItem, data) {
-
-        let tIDsi = tooltipItem.datasetIndex;
-        let playerName = (data.datasets[tIDsi]).label;
-        let xPointIndex = tooltipItem.xLabel-1;
-        let context = (contexts[playerName])[xPointIndex];
-        let deltaRating = 0;
-        let score = "";
-
-        //let context = algoResults[contextIndex];
-
-        console.log(JSON.stringify(context, null, 2));
-
-        // Add partner and opponents names to tooltip
-        let players = " with ";
-        if (playerName == context.home1_name) {
-            players += context.home2_name + " vs " + context.visitor1_name + " and " + context.visitor2_name ;
-            deltaRating = context.home_player1_rating_final - context.home_player1_rating_initial
-            score = String(context.home_points) + "-" + String(context.visitor_points);
-        } else if (playerName == context.home2_name) {
-            players += context.home1_name + " vs " + context.visitor1_name + " and " + context.visitor2_name;
-            deltaRating = context.home_player2_rating_final - context.home_player2_rating_initial
-            score = String(context.home_points) + "-" + String(context.visitor_points);
-        } else if (playerName == context.visitor1_name) {
-            players += context.visitor2_name + " vs " + context.home1_name + " and " + context.home2_name;
-            deltaRating = context.visitor_player1_rating_final - context.visitor_player1_rating_initial
-            score = String(context.visitor_points) + "-" + String(context.home_points);
-        } else {
-            players += context.visitor1_name + " vs " + context.home1_name + " and " + context.home2_name
-            deltaRating = context.visitor_player2_rating_final - context.visitor_player2_rating_initial
-            score = String(context.visitor_points) + "-" + String(context.home_points);
-        };
-
-        return context["match_date"] + " Game " + context["game_number"] + " (" + score + ")" + players + " " + " \u0394: " + deltaRating.toFixed(3);
-        //return data.datasets[tooltipItem.datasetIndex].label + " Week " + tooltipItem.label + ": " + tooltipItem.value;
     }
 
     ctcb = function (tooltipModel) {
@@ -148,45 +102,18 @@ async function handleOnLoad() {
         tooltipEl.classList.add('no-transform');
     }
 
-    function getBody(bodyItem) {
-        return bodyItem.lines;
-    }
+    let dsi = chart.active[0]._datasetIndex;
+    let xIndex = chart.active[0]._index;
 
-    // Set Text
-    // if (tooltipModel.body) {
-    //     var titleLines = tooltipModel.title || [];
-    //     var bodyLines = tooltipModel.body.map(getBody);
+    let playerName = chart.config.data.datasets[dsi].label;
 
-    //     var innerHtml = '<thead>';
-
-    //     titleLines.forEach(function(title) {
-    //         innerHtml += '<tr><th>' + title + '</th></tr>';
-    //     });
-    //     innerHtml += '</thead><tbody>';
-
-    //     bodyLines.forEach(function(body, i) {
-    //         var colors = tooltipModel.labelColors[i];
-    //         var style = 'background:' + colors.backgroundColor;
-    //         style += '; border-color:' + colors.borderColor;
-    //         style += '; border-width: 2px';
-    //         var span = '<span style="' + style + '"></span>';
-    //         innerHtml += '<tr><td>' + span + body + '</td></tr>';
-    //     });
-    //     innerHtml += '</tbody>';
-
-    //     var tableRoot = tooltipEl.querySelector('table');
-    //     tableRoot.innerHTML = innerHtml;
-    // }
+    let context = (contexts[playerName])[xIndex];
 
 
-    // <div class="container">
-    // </div>`;
-
-let innerHTML = `
-
-    <div class="full_row">Date: 2025-10-06, Match: 3-M001, Game: 1</div>
-    <div></div>
-
+    let innerHTML = `
+      <div class="full_row">Date: ${context.match_date}, Match: ${context.match_id}, Game: ${context.game_number}</div>
+    
+      <div></div>
       <div class="name_holder">Players</div>
       <div class="data_holder">Before</div>
       <div class="data_holder">After</div>
@@ -194,38 +121,39 @@ let innerHTML = `
       <div class="data_holder">Score</div>
 
       <div class="name_holder">Visitor&nbsp;1:</div>
-      <div class="name_holder">Mark&nbsp;Attwood</div>
-      <div class="data_holder">4.567</div>
-      <div class="data_holder">4.678</div>
-      <div class="data_holder">0.111</div>
+      <div class="name_holder">${context.visitor1_name}</div>
+      <div class="data_holder">${context.visitor1_rating_before.toFixed(3)}</div>
+      <div class="data_holder">${context.visitor1_rating_after.toFixed(3)}</div>
+      <div class="data_holder">${(context.visitor1_rating_after - context.visitor1_rating_before).toFixed(3)}</div>
+      <div></div>
 
       <div class="name_holder">Visitor&nbsp;2:</div>
-      <div class="name_holder">Jim&nbsp;Doran</div>
-      <div class="data_holder">6.543</div>
-      <div class="data_holder">6.654</div>
-      <div class="data_holder">0.111</div>
-      <div class="visitors-score">11</div>
+      <div class="name_holder">${context.visitor2_name}</div>
+      <div class="data_holder">${context.visitor2_rating_before.toFixed(3)}</div>
+      <div class="data_holder">${context.visitor2_rating_after.toFixed(3)}</div>
+      <div class="data_holder">${(context.visitor2_rating_after - context.visitor2_rating_before).toFixed(3)}</div>
+      <div class="score_holder">${(context.visitor_points)}</div>
 
       <div class="name_holder">Home&nbsp;1:</div>
-      <div class="name_holder">John&nbsp;Doe</div>
-      <div class="data_holder">4.234</div>
-      <div class="data_holder">4.123</div>
-      <div class="data_holder">-0.111</div>
+      <div class="name_holder">${context.home1_name}</div>
+      <div class="data_holder">${context.home1_rating_before.toFixed(3)}</div>
+      <div class="data_holder">${context.home1_rating_after.toFixed(3)}</div>
+      <div class="data_holder">${(context.home1_rating_after - context.home1_rating_before).toFixed(3)}</div>
+      <div></div>
 
       <div class="name_holder">Home&nbsp;2:</div>
-      <div class="name_holder">Ben&nbsp;Johns</div>
-      <div class="data_holder">3.000</div>
-      <div class="data_holder">2.889</div>
-      <div class="data_holder">-0.111</div>
-      <div class="home-score">8</div>
+      <div class="name_holder">${context.home2_name}</div>
+      <div class="data_holder">${context.home2_rating_before.toFixed(3)}</div>
+      <div class="data_holder">${context.home2_rating_after.toFixed(3)}</div>
+      <div class="data_holder">${(context.home2_rating_after - context.home2_rating_before).toFixed(3)}</div>
+      <div class="score_holder">${context.home_points}</div>
 
-      <div class="full_row">crf: 0.0, scale: 0.1, curve: 2.0, algo_type: Elo</div>`;
+      <div class="full_row">crf: ${context.meta.crf}, scale: ${context.meta.scale}, curve: ${context.meta.curve}, algo_type: ${context.meta.algo_type}</div>`;
 
+    // Load tooltip with html formatted information about the point clicked/hovered over
+    tooltipEl.innerHTML = innerHTML;
 
-        //var tooltipDiv = tooltipEl.querySelector('div');
-        tooltipEl.innerHTML = innerHTML;
-
-    // `this` will be the overall tooltip
+    // Set location and styles of tooltip
     var position = this._chart.canvas.getBoundingClientRect();
 
     // Display, position, and set styles for font
@@ -240,11 +168,12 @@ let innerHTML = `
     tooltipEl.style.pointerEvents = 'none';
     
 }
+    let ctx = document.getElementById('myChart').getContext('2d');
+        
     chart = new Chart(ctx, {
         type: "scatter",
         data: { datasets: chartDatasets },
         options: {
-            //tooltips: { enabled: true, custom: function (tooltipModel) { var ttm = tooltipModel; } },
             title: { display: true, text: document.getElementById("title").innerText },
             tooltips: { enabled: false, custom: ctcb },
             animation: { duration: 0 },
@@ -252,11 +181,6 @@ let innerHTML = `
             legend: { display: true, labels: { boxWidth: 12 } },
             scales: {
                 yAxes: [{
-                    // ticks: {
-                    //     callback: function (value, index, values) {
-                    //         return Math.abs(value);
-                    //     }
-                    // },
                     scaleLabel: {
                         display: true,
                         labelString: "VIPR Rating",
@@ -291,14 +215,14 @@ function handlePlayerChange(playerNumber) {
         // Build context and data arrays
         for (let i = 0; i < Object.keys(algoResults).length; i++){
 
-            if ((algoResults[i])["visitor1_name"] == playerName) {
-                y = (algoResults[i])["visitor_player1_rating_final"];
-            } else if ((algoResults[i])["visitor2_name"] == playerName) {
-                y = (algoResults[i])["visitor_player2_rating_final"];
-            } else if ((algoResults[i])["home1_name"] == playerName) {
-                y = (algoResults[i])["home_player1_rating_final"];}
-            else if ((algoResults[i])["home2_name"] == playerName) {
-                y = (algoResults[i])["home_player2_rating_final"];
+            if ((algoResults[i]).visitor1_name == playerName) {
+                y = (algoResults[i]).visitor1_rating_after;
+            } else if ((algoResults[i]).visitor2_name == playerName) {
+                y = (algoResults[i]).visitor2_rating_after;
+            } else if ((algoResults[i]).home1_name == playerName) {
+                y = (algoResults[i]).home1_rating_after;
+            } else if ((algoResults[i]).home2_name == playerName) {
+                y = (algoResults[i]).home2_rating_after;
             } else {
                 y = null;
             }
@@ -309,10 +233,9 @@ function handlePlayerChange(playerNumber) {
                 contextArray.push(algoResults[i]);
             };
 
-            //contexts[playerName] = contextArray;
-
         }
-            contexts[playerName] = contextArray;
+            
+        contexts[playerName] = contextArray;
 
         chartDataset = {
             label: playerName,
@@ -348,13 +271,13 @@ function handlePlayerChange(playerNumber) {
 
 function handleManualYscaleClick() {
 
-    var chartOptions;
-    var isManualYscale = document.getElementById("manualYscale").checked;
+    let chartOptions;
+    let isManualYscale = document.getElementById("manualYscale").checked;
 
     if (isManualYscale) {
 
-        var yfrom = Number(document.getElementById("yfrom").value);
-        var yto = Number(document.getElementById("yto").value);
+        let yfrom = Number(document.getElementById("yfrom").value);
+        let yto = Number(document.getElementById("yto").value);
 
         if (yfrom > yto) {
             var temp = yfrom;
@@ -421,7 +344,7 @@ function handleManualYscaleClick() {
 
 
 function handleSteppedClick() {
-    var isChecked = document.getElementById("stepped").checked;
+    let isChecked = document.getElementById("stepped").checked;
 
     chart.data.datasets.forEach(function (dataset) {
         dataset.steppedLine = isChecked;
@@ -431,7 +354,7 @@ function handleSteppedClick() {
 }
 
 function handleLegendVisibleClick() {
-    var isChecked = document.getElementById("legendVisible").checked;
+    let isChecked = document.getElementById("legendVisible").checked;
 
     //chart.options.legend.display = isChecked;
     chart.config.options.legend.display = isChecked;
@@ -440,7 +363,7 @@ function handleLegendVisibleClick() {
 }
 
 function handleTitleVisibleClick() {
-    var isChecked = document.getElementById("titleVisible").checked;
+    let isChecked = document.getElementById("titleVisible").checked;
 
     //chart.options.title.display = isChecked;
     chart.config.options.title.display = isChecked;
@@ -453,11 +376,11 @@ function handleYfromYtoInput() {
     // Only run if in manual Y scale mode
     if (document.getElementById("manualYscale").checked) { 
 
-        var yfrom = Number(document.getElementById("yfrom").value);
-        var yto = Number(document.getElementById("yto").value);
+        let yfrom = Number(document.getElementById("yfrom").value);
+        let yto = Number(document.getElementById("yto").value);
 
         if (yfrom > yto) {
-            var temp = yfrom;
+            let temp = yfrom;
             yfrom = yto;
             yto = temp;
         }
@@ -492,54 +415,7 @@ function handleYfromYtoInput() {
 }
 
 function toggleSettingsVisibility() {
-    var settingsDisplay = document.getElementById("settings").style.display;
+    let settingsDisplay = document.getElementById("settings").style.display;
     document.getElementById("chartHolder").style.height = (settingsDisplay == "none") ? "80vh" : "88vh";
     document.getElementById("settings").style.display = (settingsDisplay == "none") ? "grid" : "none";
 }
-
-function handleCanvasClick(e) {
-//    var activePoints = chart.getElementsAtEvent(e);
-//    var meta = chart.getDatasetMeta(0);
-//    var ds = chart.data.datasets[0]; // use index not 0!
-}
-
-// // Simple CSV parser (supports quoted fields)
-// function parseCSV(text) {
-//     const rows = [];
-//     let current = '';
-//     let row = [];
-//     let inQuotes = false;
-
-//     for (let i = 0; i < text.length; i++) {
-//         const char = text[i];
-//         const nextChar = text[i + 1];
-
-//         if (char === '"' && inQuotes && nextChar === '"') {
-//             // Escaped quote
-//             current += '"';
-//             i++;
-//         } else if (char === '"') {
-//             inQuotes = !inQuotes;
-//         } else if (char === ',' && !inQuotes) {
-//             row.push(current);
-//             current = '';
-//         } else if ((char === '\n' || char === '\r') && !inQuotes) {
-//             if (current || row.length > 0) {
-//                 row.push(current);
-//                 rows.push(row);
-//                 row = [];
-//                 current = '';
-//             }
-//         } else {
-//             current += char;
-//         }
-//     }
-
-//     // Add last value if exists
-//     if (current || row.length > 0) {
-//         row.push(current);
-//         rows.push(row);
-//     }
-
-//     return rows;
-// }

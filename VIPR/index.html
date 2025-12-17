@@ -17,10 +17,10 @@
 
     .container {
       display: grid;
-      grid-template-columns: 0.8fr 2fr repeat(4, 1fr);
+      grid-template-columns: 0.8fr 1.8fr repeat(3, 0.7fr, 0.5fr);
       gap: 2px;
       background-color: aliceblue;
-      width: 480px;
+      width: 400px;
       /* position: absolute;
       pointer-events:  none; */
     }
@@ -34,25 +34,16 @@
       text-align: center;
     }
 
+    .score_holder {
+      text-align: center;
+      margin-top: -1em;
+    }
+
     .full_row {
       grid-column-start: 1;
       grid-column-end: 7;
       text-align: center;
       padding: 3px;
-    }
-
-    .visitors-score {
-      grid-row: 3 / 5;
-      grid-column: 6 / 7;
-      text-align: center;
-      padding-top: 10px;
-    }
-
-    .home-score {
-      grid-row: 5 / 7;
-      grid-column: 6 / 7;
-      text-align: center;
-      padding-top: 10px;
     }
 
   </style>
