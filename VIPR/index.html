@@ -7,6 +7,8 @@
     <?xml version="1.0" encoding="utf-8" ?>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
     <script src="js/ViewRatings.js"></script>
   <style>
 
@@ -65,7 +67,7 @@
     </div>
 
     <!-- Player 2, Player 3 and other settings-->
-    <div id="settings" style="max-height: 50px; min-height: 50px; grid-template-columns: auto 64px 160px 160px 160px auto; background-color: rgb(221,235, 247); display: none; width: 100%; padding-top: 6px; padding-bottom: 6px; ">
+    <div id="settings" style="max-height: 50px; min-height: 50px; grid-template-columns: auto 64px 160px 160px 170px auto; background-color: rgb(221,235, 247); display: none; width: 100%; padding-top: 6px; padding-bottom: 6px; ">
         <div></div>
 
         <label for="player1" style="padding-left: 6px">Player 2:</label>
@@ -73,8 +75,15 @@
         <select name="player1" id="player1" onchange="handlePlayerChange(1)" style="margin-right: 12px; margin-bottom: 4px;"></select>
 
         <div>
-            <input type="checkbox" id="stepped" name="stepped" checked onclick="handleSteppedClick()" />
-            <label for="stepped">Stepped</label>
+          <span>
+              <input type="checkbox" id="stepped" name="stepped" checked onclick="handleSteppedClick()" />
+              <label for="stepped">Stepped&nbsp;&nbsp;</label>
+          </span>
+
+          <span style="visibility: visible;">
+              <input type="checkbox" id="datex" name="datex"  onclick="handleDatexClick()" />
+              <label for="datex">Date X</label>
+          </span>
         </div>
 
         <div>
@@ -102,10 +111,10 @@
         </div>
 
         <div>
-            <label for="yfrom">From</label>
-            <input type="text" id="yfrom" name="yfrom" value="3" style="width: 30px;" oninput="handleYfromYtoInput()" />
+            <label for="yfrom">&nbsp;From</label>
+            <input type="text" id="yfrom" name="yfrom" value="3" style="width: 18px;" oninput="handleYfromYtoInput()" />
             <label for="yto">To</label>
-            <input type="text" id="yto" name="yto" value="6" style="width: 30px;" oninput="handleYfromYtoInput()" />
+            <input type="text" id="yto" name="yto" value="6" style="width: 18px;" oninput="handleYfromYtoInput()" />
         </div>
 
     </div>
