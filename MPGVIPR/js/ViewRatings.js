@@ -22,7 +22,7 @@ const playerResults = [];
 async function handleOnLoad() {
 
     // Create hash from password
-    hash = await hashString(pwd);
+    let hash = await hashString(pwd);
     let resultsFilename = hash.substring(20,10) + "_mens.json";
 
     // Real code will just gets back match results for selected player but for now extract it from all data
@@ -319,5 +319,6 @@ async function hashString(message) {
         throw err;
     }
 }
+
 
 
