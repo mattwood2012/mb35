@@ -13,30 +13,20 @@ const nameLookup = {};
 
 var chart;
 var playerName;
+var pwd = prompt("Please enter your password:");
 
 const chartDatasets = [];
-
 const playerResults = [];
-
-//const dateXaxis = false;
-
 
 // Once all html/javascript/css has loaded initialize everything
 async function handleOnLoad() {
 
-    // Get password
-    const pwd = prompt("Please enter your password:");
-    console.log("Pwd: " + pwd);
-    let hash = "";
-
-    // Example usage:
-        hash = await hashString(pwd);
+    // Create hash from password
+    hash = await hashString(pwd);
+    let resultsFilename = hash.substring(20,10) + "_mens.json";
 
     // Real code will just gets back match results for selected player but for now extract it from all data
     // First read the results document (players names, before and after ratings etc.)
-    
-    let resultsFilename = hash.substring(20,10) + "_mens.json";
-
     try {
         let response = await fetch("data/" + resultsFilename);
         let textResults = await response.text();
@@ -223,6 +213,7 @@ function handleDatexClick() {
     let cddd = chart.data.datasets[0].data;
     cddd.length = 0;
     let dateXaxis = document.getElementById("datex").checked;
+    let x = 1;
     let y;
     
     contexts.forEach((context) => {
@@ -328,4 +319,5 @@ async function hashString(message) {
         throw err;
     }
 }
+
 
