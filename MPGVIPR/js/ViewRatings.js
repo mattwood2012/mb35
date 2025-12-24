@@ -9,20 +9,16 @@ var ctcb;   // Custom Tooltip Call Back
 
 const contexts = [];    // Holds meta data (partner, opponents, scores etc.) that is displayed in tooltip
 
-const nameLookup = {};
-
 var chart;
 var playerName;
-var pwd = prompt("Please enter your password:");
-
-const chartDatasets = [];
-const playerResults = [];
+var pwd = "VIPR4MPG"; //prompt("Please enter your password:");
 
 // Once all html/javascript/css has loaded initialize everything
 async function handleOnLoad() {
 
     // Create hash from password
-    let hash = await hashString(pwd);
+    const hash = await hashString(pwd);
+    pwd = "";
     let resultsFilename = hash.substring(20,10) + "_mens.json";
 
     // Real code will just gets back match results for selected player but for now extract it from all data
@@ -50,7 +46,6 @@ async function handleOnLoad() {
                             ar.home2_uid == player_uid;
                             
         if ( playerInGame) {
-            playerResults.push(ar);
 
             y = GetY(ar, player_uid);
             
@@ -142,9 +137,11 @@ async function handleOnLoad() {
         tooltipEl.style.position = 'absolute';
 
         let left = position.left + window.pageXOffset + tooltipModel.caretX;
-        if (left > window.screen.width / 2) {left -= 400;}
-        tooltipEl.style.left = left + 'px';
+        if (left > window.screen.width / 2) {
+            left -= 400;    // 400 comes from CSS (tooltip) container class width
+        }
 
+        tooltipEl.style.left = left + 'px';
         tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
         tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
         tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
@@ -153,7 +150,6 @@ async function handleOnLoad() {
         tooltipEl.style.pointerEvents = 'none';
         
     }
-
 
     const chartDataset = {
         label: playerName,
@@ -169,50 +165,24 @@ async function handleOnLoad() {
 
     // Create the chart
     let ctx = document.getElementById('myChart').getContext('2d');
-        
+        let xAxisType = document.getElementById("datex").checked ? "time" : "linear";
     chart = new Chart(ctx, {
         type: "scatter",
-        data: { datasets: [chartDataset] },
-        options: {
-            title: { display: true, text: playerName + ": " + document.getElementById("title").innerText + version },
-            tooltips: { enabled: false, custom: ctcb },
-            animation: { duration: 0 },
-            maintainAspectRatio: false,
-            legend: { display: true, labels: { boxWidth: 12 } },
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "VIPR Rating",
-                    }
-                }],
-                xAxes: [{
-                    type: "time",
-                    time: {
-                        unit: "week",
-                        displayFormats: {
-                            day: "yyyy-MM-dd"
-                        },
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Game #"
-                    }
-                }]
-
-            }
-        }
+        data: { datasets: [chartDataset] } //,
     })
+
+    SetOptions();
 
     chart.update();
 }
 
 // Toggle between linear Game # and Date on x-axis
-function handleDatexClick() {
+function handleDatexAxisClick() {
 
     let cddd = chart.data.datasets[0].data;
     cddd.length = 0;
-    let dateXaxis = document.getElementById("datex").checked;
+
+    let isDateXaxis = document.getElementById("datex").checked;
     let x = 1;
     let y;
     
@@ -220,7 +190,7 @@ function handleDatexClick() {
         y = GetY(context, player_uid);
         
         if (y) {
-            if (dateXaxis) {
+            if (isDateXaxis) {
                 cddd.push({x : context.match_date, y: y});
             } else {
                 cddd.push({x: x++, y: y});
@@ -229,31 +199,30 @@ function handleDatexClick() {
 
     });
 
+    SetOptions();
     chart.update();
 }
 
 function handleSteppedClick() {
-    let isChecked = document.getElementById("stepped").checked;
+    let isStepped = document.getElementById("stepped").checked;
 
-    chart.data.datasets.forEach(function (dataset) {
-        dataset.steppedLine = isChecked;
-    });
+    chart.data.datasets[0].steppedLine = isStepped;
 
     chart.update();
 }
 
 function handleLegendVisibleClick() {
-    let isChecked = document.getElementById("legendVisible").checked;
+    let isLegendVisible = document.getElementById("legendVisible").checked;
 
-    chart.config.options.legend.display = isChecked;
+    chart.config.options.legend.display = isLegendVisible;
 
     chart.update();
 }
 
 function handleTitleVisibleClick() {
-    let isChecked = document.getElementById("titleVisible").checked;
+    let isTitleVisible = document.getElementById("titleVisible").checked;
 
-    chart.config.options.title.display = isChecked;
+    chart.config.options.title.display = isTitleVisible;
 
     chart.update();
 }
@@ -320,5 +289,64 @@ async function hashString(message) {
     }
 }
 
+function SetOptions() {
+// The two objects used as options:
+let titleText = document.getElementById("title").innerText + version;
+let istitleVisible = document.getElementById("titleVisible").checked;
+let islegendVisible = document.getElementById("legendVisible").checked;
+
+if (document.getElementById("datex").checked) {
+    chart.options = {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "VIPR Rating",
+                    }
+                }],
+                xAxes: [{
+                    type: "time",
+                    time: {
+                        unit: "week",
+                        displayFormats: {
+                            day: "yyyy-MM-dd"
+                        },
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Date"
+                    }
+                }]
+
+            }
+        };
+} else {
+    chart.options = {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "VIPR Rating",
+                    }
+                }],
+                xAxes: [{
+                    type: "linear",
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Game #"
+                    }
+                }]
+
+            }
+        };
+    }
+
+    // Options that are common to date and game number
+    chart.options["title"] = {display: istitleVisible, text: titleText};
+    chart.options["tooltips"] = { enabled: false, custom: ctcb};
+    chart.options["animation"] = { duration: 0 };
+    chart.options["maintainAspectRatio"] = false;
+    chart.options["legend"] = {display: islegendVisible, labels: { boxWidth: 12 } };
+}
 
 

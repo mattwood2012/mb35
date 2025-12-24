@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
     <script src="js/ViewRatings.js"></script>
+    <!-- <script src="js/Working.js"></script> -->
   <style>
 
     .container {
@@ -51,15 +52,31 @@
 
 </head>
 
-<body onload="handleOnLoad()" style="min-width: 360px; height:100%">
+<body onload="handleOnLoad()" style="min-width: 360px;"> <!-- height:100%"> -->
+
+    <!-- Password-->
+    <!--
+      <span>
+        <label for="userPassword">Password:</label>
+        <input id="userPassword" type="password" style="width: 100px;"/>
+        <button onclick="handlePasswordClicked()">OK</button>
+      </span> 
+     -->
 
     <!-- Settings-->
-    <div class="settings_holder" style="background-color: aqua; gap: 2px; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); display: grid; width: 100%; padding-top: 6px; padding-bottom: 6px; ">
+    <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">
       <div></div>  
+      <!-- <div>
+        <span>
+          <label for="userPassword">Password:</label>
+          <input id="userPassword" type="password" />
+        </span>
+      </div> -->
+
       <div>
         <span>
           <input type="checkbox" id="stepped" name="stepped" checked onclick="handleSteppedClick()" />
-          <label for="stepped">Stepped&nbsp;&nbsp;</label>
+          <label for="stepped">Stepped</label>
         </span>
       </div>
 
@@ -68,7 +85,6 @@
                 <input style="background-color: orange;" type="checkbox" id="titleVisible" name="titleVisible" checked onclick="handleTitleVisibleClick()" style="margin-left: 16px;" />
                 <label for="titleVisible">Title</label>
             </span>
-
       </div>
 
       <div>
@@ -80,12 +96,13 @@
 
       <div>
         <span>
-            <input type="checkbox" id="datex" name="datex"  onclick="handleDatexClick()" />
+            <input type="checkbox" id="datex" name="datex"  onclick="handleDatexAxisClick()" />
             <label for="datex">Date X-axis</label>
         </span>
       </div>
 
       <div></div>
+
 
     </div>
 
