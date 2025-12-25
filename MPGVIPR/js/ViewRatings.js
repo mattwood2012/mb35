@@ -2,7 +2,6 @@
 "use strict";
 const version = " V0.1";
 const player_uid = "49d40ef4a000349ccbc15c5e";
-const chartTitle = document.getElementById("title").innerText;
 
 var algoResults;
 var ctcb;   // Custom Tooltip Call Back
@@ -62,7 +61,8 @@ async function handleOnLoad() {
     })
     
     // Custom tooltip callback function
-    ctcb = function (tooltipModel) {
+    ctcb = function (tooltipContext) {
+        const tooltipModel = tooltipContext.tooltip;
 
         // Get tooltip Element
         var tooltipEl = document.getElementById('tooltip');
@@ -82,7 +82,8 @@ async function handleOnLoad() {
         }
 
         // Lookup context for this game
-        let xIndex = chart.active[0]._index;
+        //let xIndex = chart.active[0]._index;
+        let xIndex = tooltipContext.chart._active[0].index;
         let context = contexts[xIndex];
 
         // Build the html the tooltip will hold
@@ -130,7 +131,7 @@ async function handleOnLoad() {
         tooltipEl.innerHTML = innerHTML;
 
         // Set location and styles of tooltip
-        var position = this._chart.canvas.getBoundingClientRect();
+        var position = chart.canvas.getBoundingClientRect();
 
         // Display, position, and set styles for font
         tooltipEl.style.opacity = 1;
@@ -155,7 +156,7 @@ async function handleOnLoad() {
         label: playerName,
         fill: false,
         showLine: true,
-        steppedLine: true,
+        stepped: true,
         lineTension: 0,
         pointRadius: 4,
         borderColor: "rgb(247,136,47)",
@@ -200,13 +201,14 @@ function handleDatexAxisClick() {
     });
 
     SetOptions();
+
     chart.update();
 }
 
 function handleSteppedClick() {
     let isStepped = document.getElementById("stepped").checked;
 
-    chart.data.datasets[0].steppedLine = isStepped;
+    chart.data.datasets[0].stepped = isStepped;
 
     chart.update();
 }
@@ -214,15 +216,16 @@ function handleSteppedClick() {
 function handleLegendVisibleClick() {
     let isLegendVisible = document.getElementById("legendVisible").checked;
 
-    chart.config.options.legend.display = isLegendVisible;
-
+    //chart.config.options.legend.display = isLegendVisible;
+    chart.options.plugins["legend"] = {display: isLegendVisible, labels: { boxWidth: 12 } };
     chart.update();
 }
 
 function handleTitleVisibleClick() {
     let isTitleVisible = document.getElementById("titleVisible").checked;
 
-    chart.config.options.title.display = isTitleVisible;
+    //chart.config.options.title.display = isTitleVisible;
+    chart.options.plugins["title"].display = isTitleVisible;
 
     chart.update();
 }
@@ -290,63 +293,56 @@ async function hashString(message) {
 }
 
 function SetOptions() {
-// The two objects used as options:
-let titleText = document.getElementById("title").innerText + version;
-let istitleVisible = document.getElementById("titleVisible").checked;
-let islegendVisible = document.getElementById("legendVisible").checked;
 
+const titleText = document.getElementById("title").innerText + version;
+const isTitleVisible = document.getElementById("titleVisible").checked;
+const isLegendVisible = document.getElementById("legendVisible").checked;
+
+// The two objects used as options for Date and Game # x axis:
 if (document.getElementById("datex").checked) {
     chart.options = {
+            animation: false,
+            maintainAspectRatio: false,
+            plugins: {
+                legend:{display: isLegendVisible, labels: {boxWidth: 12}},
+                title: {display: isTitleVisible, text: titleText},
+                tooltip: { enabled: false, external: ctcb}
+            },
             scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "VIPR Rating",
-                    }
-                }],
-                xAxes: [{
+                x: {
+                    id: "x",
                     type: "time",
-                    time: {
-                        unit: "week",
-                        displayFormats: {
-                            day: "yyyy-MM-dd"
-                        },
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Date"
-                    }
-                }]
-
+                    time: {unit: "week", displayFormats: {day: "yyyy-MM-dd"}},
+                    title: {display: true, text: "Date"}
+                },
+                y: {
+                    id: "y",
+                    type: "linear",
+                    title: {display: true, text: "VIPR Rating"}
+                }
             }
         };
 } else {
     chart.options = {
+            animation: false,
+            maintainAspectRatio: false,
+            plugins: {
+                legend:{display: isLegendVisible, labels: {boxWidth: 12}},
+                title: {display: isTitleVisible, text: titleText},
+                tooltip: { enabled: false, external: ctcb}
+            },
             scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "VIPR Rating",
-                    }
-                }],
-                xAxes: [{
+                x: {
+                    id: "x",
                     type: "linear",
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Game #"
-                    }
-                }]
-
+                    title: {display: true, text: "Game #"}
+                },
+                y: {
+                    id: "y",
+                    type: "linear",
+                    title: {display: true, text: "VIPR Rating"}
+                }
             }
         };
     }
-
-    // Options that are common to date and game number
-    chart.options["title"] = {display: istitleVisible, text: titleText};
-    chart.options["tooltips"] = { enabled: false, custom: ctcb};
-    chart.options["animation"] = { duration: 0 };
-    chart.options["maintainAspectRatio"] = false;
-    chart.options["legend"] = {display: islegendVisible, labels: { boxWidth: 12 } };
 }
-
-
