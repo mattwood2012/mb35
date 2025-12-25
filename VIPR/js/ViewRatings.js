@@ -5,22 +5,14 @@ const maxPlayers = 3;
 const chartTitle = document.getElementById("title").innerText;
 const lineColors = ["rgb(255,0,0", "rgb(0,255,0", "rgb(0,0,255"];
 
-var lookupSource;
-var ratingsHistoryText;
-var ratingsHistoryData;
-
 var algoResults;
 var ctcb;   // Custom Tooltip Call Back
 
 const contexts = {};    // Holds meta data (partner, opponents, scores etc.) that is displayed in tooltip
-
 const nameLookup = {};
 
 var chart;
 const chartDatasets = [];
-
-//const dateXaxis = false;
-
 
 // Once all html/javascript/css has loaded initialize everything
 async function handleOnLoad() {
@@ -42,7 +34,7 @@ async function handleOnLoad() {
     
     // Load player drop downs
     // A blank line followed by all players in alphabetically sorted order
-    let players = Object.values(nameLookup)//Object.keys(ratingsHistoryData);
+    let players = Object.values(nameLookup);
     players.sort();
 
     for (var i = 0; i < maxPlayers; i++) {
@@ -153,7 +145,6 @@ async function handleOnLoad() {
         
     }
 
-
     // For each of the (3) possible chart lines create a "no player selected" Dataset
     // This Dataset will be replaced when a player is selected from a "playerX" dropdown and save in array
     for (let i = 0; i < maxPlayers; i++) {
@@ -224,6 +215,7 @@ function handlePlayerChange(playerNumber) {
     let y;
     let contextArray = [];
 
+    // Get the dataset for this playerN id and clear the data
     let cds = chart.data.datasets[playerNumber];
     cds.data.length = 0; 
 
@@ -284,9 +276,50 @@ function handlePlayerChange(playerNumber) {
     chart.update();
 }
 
+function handleDatexClick() {
+
+    // Use handlePlayerChange to take care of correct date/linear data format
+    for (let i=0; i<maxPlayers; i++) {
+        handlePlayerChange(i)
+    }
+
+}
+
+function handleSteppedClick() {
+    let isStepped = document.getElementById("stepped").checked;
+
+    chart.data.datasets.forEach(function (dataset) {
+        dataset.steppedLine = isStepped;
+    });
+
+    chart.update();
+}
+
+function handleLegendVisibleClick() {
+    let isLegendVisible = document.getElementById("legendVisible").checked;
+
+    chart.config.options.legend.display = isLegendVisible;
+
+    chart.update();
+}
+
+function handleTitleVisibleClick() {
+    let isTitleVisible = document.getElementById("titleVisible").checked;
+
+    chart.config.options.title.display = isTitleVisible;
+
+    chart.update();
+}
+
+function toggleSettingsVisibility() {
+    let areSettingsDisplayed = document.getElementById("settings").style.display;
+    document.getElementById("chartHolder").style.height = (areSettingsDisplayed == "none") ? "80vh" : "88vh";
+    document.getElementById("settings").style.display = (areSettingsDisplayed == "none") ? "grid" : "none";
+}
+
 function handleManualYscaleClick() {
 
-    let chartOptions;
+    let chartOptionsScalesYaxis0Ticks = chart.options.scales.yAxes[0].ticks;
     let isManualYscale = document.getElementById("manualYscale").checked;
 
     if (isManualYscale) {
@@ -302,58 +335,22 @@ function handleManualYscaleClick() {
             yto = temp;
         }
 
-        chart.options.scales.yAxes[0].ticks.min = yfrom;
-        chart.options.scales.yAxes[0].ticks.max = yto;
+        chartOptionsScalesYaxis0Ticks.min = yfrom;
+        chartOptionsScalesYaxis0Ticks.max = yto;
     }
     else {
         // This forces auto range Yaxis
-        chart.options.scales.yAxes[0].ticks.min = undefined;
-        chart.options.scales.yAxes[0].ticks.max = undefined;
+        chartOptionsScalesYaxis0Ticks.min = undefined;
+        chartOptionsScalesYaxis0Ticks.max = undefined;
 
     }
-
-    chart.update();
-}
-
-function handleDatexClick() {
-
-    // Use handlePlayerChange to take care of correct date/linear data format
-    for (let i=0; i<maxPlayers; i++) {
-        handlePlayerChange(i)
-    }
-
-}
-
-
-function handleSteppedClick() {
-    let isChecked = document.getElementById("stepped").checked;
-
-    chart.data.datasets.forEach(function (dataset) {
-        dataset.steppedLine = isChecked;
-    });
-
-    chart.update();
-}
-
-function handleLegendVisibleClick() {
-    let isChecked = document.getElementById("legendVisible").checked;
-
-    chart.config.options.legend.display = isChecked;
-
-    chart.update();
-}
-
-function handleTitleVisibleClick() {
-    let isChecked = document.getElementById("titleVisible").checked;
-
-    chart.config.options.title.display = isChecked;
 
     chart.update();
 }
 
 function handleYfromYtoInput() {
 
-    let co = chart.options;
+    let chartOptionsScalesYaxis0Ticks = chart.options.scales.yAxes[0].ticks;
 
     // Toggle between manual and auto ranging of Y
     if (document.getElementById("manualYscale").checked) { 
@@ -367,29 +364,23 @@ function handleYfromYtoInput() {
             yto = temp;
         }
 
-        co.scales.yAxes[0].ticks.min = yfrom;
-        co.scales.yAxes[0].ticks.max = yto;
+        chartOptionsScalesYaxis0Ticks.min = yfrom;
+        chartOptionsScalesYaxis0Ticks.max = yto;
 
     } else {
 
-        co.scales.yAxes[0].ticks.min = undefined;
-        co.scales.yAxes[0].ticks.max = undefined;
+        chartOptionsScalesYaxis0Ticks.min = undefined;
+        chartOptionsScalesYaxis0Ticks.max = undefined;
     }
     
 
     // Chart options that need setting regardles of auto/manual
-    co.maintainAspectRatio = false;
-    co.tooltips.enabled = false;
-    co.tooltips.custom = ctcb;
+    chart.options.maintainAspectRatio = false;
+    chart.options.tooltips.enabled = false;
+    chart.options.tooltips.custom = ctcb;
 
     chart.update();
 
-}
-
-function toggleSettingsVisibility() {
-    let settingsDisplay = document.getElementById("settings").style.display;
-    document.getElementById("chartHolder").style.height = (settingsDisplay == "none") ? "80vh" : "88vh";
-    document.getElementById("settings").style.display = (settingsDisplay == "none") ? "grid" : "none";
 }
 
 function CalculateDateMinMax() {
