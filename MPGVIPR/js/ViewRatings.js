@@ -1,7 +1,7 @@
 // Globals
 "use strict";
 const version = " V0.1";
-const player_uid = "49d40ef4a000349ccbc15c5e";
+const player_uid = "c459812410f5cd9bda326c26";
 
 var algoResults;
 var ctcb;   // Custom Tooltip Call Back
@@ -18,7 +18,8 @@ async function handleOnLoad() {
     // Create hash from password
     const hash = await hashString(pwd);
     pwd = "";
-    let resultsFilename = hash.substring(20,10) + "_mens.json";
+    //let resultsFilename = hash.substring(20,10) + "_mens.json";
+    let resultsFilename = "ViprAlgoResults.json";
 
     // Real code will just gets back match results for selected player but for now extract it from all data
     // First read the results document (players names, before and after ratings etc.)
@@ -47,6 +48,7 @@ async function handleOnLoad() {
         if ( playerInGame) {
 
             y = GetY(ar, player_uid);
+            // console.log("x: " + x + ", y: " + y)
             
             if (y) {
                 if (dateXaxis) {
@@ -345,4 +347,6 @@ if (document.getElementById("datex").checked) {
             }
         };
     }
+
+    chart.options.plugins.title.text = "Hello";
 }

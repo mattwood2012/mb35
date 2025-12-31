@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?xml version="1.0" encoding="utf-8" ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
 
-    <!-- Date adapter (Luxon) -->
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+  <script src="js/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+    <script src="js/chartjs-adapter-date-fns"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script> -->
+
     <script src="js/ViewRatings.js"></script>
-    <!-- <script src="js/Working.js"></script> -->
-  <style>
+
+<style>
 
     .container {
       display: grid;
@@ -54,26 +57,11 @@
 
 </head>
 
-<body onload="handleOnLoad()" style="min-width: 360px;"> <!-- height:100%"> -->
-
-    <!-- Password-->
-    <!--
-      <span>
-        <label for="userPassword">Password:</label>
-        <input id="userPassword" type="password" style="width: 100px;"/>
-        <button onclick="handlePasswordClicked()">OK</button>
-      </span> 
-     -->
+<body onload="handleOnLoad()"> <!-- height:100%"> -->
 
     <!-- Settings-->
     <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">
       <div></div>  
-      <!-- <div>
-        <span>
-          <label for="userPassword">Password:</label>
-          <input id="userPassword" type="password" />
-        </span>
-      </div> -->
 
       <div>
         <span>
@@ -108,6 +96,7 @@
 
     </div>
 
+    <!-- <div id="chartHolder" class="chartHolder" style="height: calc(100%-60px); position: relative; width:95vw"> -->
     <div id="chartHolder" class="chartHolder" style="height: 94vh; position: relative; width:95vw">
         <canvas id="myChart"></canvas>
     </div>
