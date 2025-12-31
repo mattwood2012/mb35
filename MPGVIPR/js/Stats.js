@@ -162,7 +162,7 @@ async function handleOnLoad() {
           let bestOtherTeamLabel = (bestTeamLabel == "home") ? "visitor" : "home";
 
           // Only create best game message if player won and combined rating delta is lowest
-          if ((gr.winner == teamLabel) && (gr["playerTeamCombinedDeltaRating"] <= bestMinPlayerTeamCombinedRating)) {
+          if ((gr.winner == bestTeamLabel) && (gr["playerTeamCombinedDeltaRating"] <= bestMinPlayerTeamCombinedRating)) {
             bestGameMessage = `On ${gr.match_date} you and ${gr[bestPartnerLabel + "_name"]} beat ${gr[bestOtherTeamLabel + "1_name"]} and ${gr[bestOtherTeamLabel + "2_name"]}`;
             bestGameMessage += ` ${gr[bestTeamLabel+"_points"]}-${gr[bestOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${gr["playerTeamCombinedDeltaRating"].toFixed(3)}`;
             bestMinPlayerTeamCombinedRating = gr["playerTeamCombinedDeltaRating"];
@@ -186,7 +186,7 @@ async function handleOnLoad() {
           let worstOtherTeamLabel = (worstTeamLabel == "home") ? "visitor" : "home";
 
           // Only create worst game message if player lost and combined rating delta is highest
-          if ((gr.loser == teamLabel) && (gr["playerTeamCombinedDeltaRating"] >= worstMaxPlayerTeamCombinedRating)) {
+          if ((gr.loser == worstTeamLabel) && (gr["playerTeamCombinedDeltaRating"] >= worstMaxPlayerTeamCombinedRating)) {
             worstGameMessage = `On ${gr.match_date} you and ${gr[worstPartnerLabel + "_name"]} lost to ${gr[worstOtherTeamLabel + "1_name"]} and ${gr[worstOtherTeamLabel + "2_name"]}`;
             worstGameMessage += ` ${gr[worstTeamLabel+"_points"]}-${gr[worstOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${gr["playerTeamCombinedDeltaRating"].toFixed(3)}`;
             worstMaxPlayerTeamCombinedRating = gr["playerTeamCombinedDeltaRating"];
