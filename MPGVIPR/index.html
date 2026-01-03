@@ -1,106 +1,96 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 <head>
     <meta charset="UTF-8">
-    <title id="title">Villages Internal Pickleball Rating</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?xml version="1.0" encoding="utf-8" ?>
+    <title>Load Chart or Statistics</title>
+    <script src="js/index.js"></script>
 
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-  <script src="js/chart.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
 
-    <script src="js/chartjs-adapter-date-fns"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script> -->
+        h2 {
+            color: #d35400;
+            margin-bottom: 25px;
+        }
 
-    <script src="js/ViewRatings.js"></script>
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #444;
+        }
 
-<style>
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 2px solid #f39c12;
+            border-radius: 6px;
+            font-size: 14px;
+        }
 
-    .container {
-      display: grid;
-      grid-template-columns: 0.8fr 1.8fr repeat(3, 0.7fr, 0.5fr);
-      gap: 2px;
-      background-color: aliceblue;
-      width: 400px;
-    }
+        button {
+            margin-top: 20px;
+            width: 45%;
+            padding: 10px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            background: #e67e22;
+            transition: background 0.2s ease;
+        }
 
-    .name_holder {
-      text-align: right;
-      padding-right: 10px;
-    }
+        button:hover {
+            background: #d35400;
+        }
 
-    .data_holder {
-      text-align: center;
-    }
-
-    .score_holder {
-      text-align: center;
-      margin-top: -1em;
-    }
-
-    .full_row {
-      grid-column-start: 1;
-      grid-column-end: 7;
-      text-align: center;
-      padding: 3px;
-    }
-
-    .settings_holder {
-      color: black;
-      background-color: orange;
-      opacity: 1;
-    }
-
-  </style>
-
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
 </head>
+<body>
 
-<body onload="handleOnLoad()"> <!-- height:100%"> -->
+    <div class="container">
+        <h2>Select a league then choose Chart or Stats</h2>
 
-    <!-- Settings-->
-    <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">
-      <div></div>  
+        <label for="pwd">Password:</label>
+        <input type="password" id="pwd" name="pwd">
 
-      <div>
-        <span>
-          <input type="checkbox" id="stepped" name="stepped" checked onclick="handleSteppedClick()" />
-          <label for="stepped">Stepped</label>
-        </span>
-      </div>
+        <label for="leagueSelect">League:</label>
+        <select id="leagueSelect" name="leagueSelect">
+            <option value="mens">Mens</option>
+            <option value="pyp">PYP</option>
+        </select>
 
-      <div>
-            <span">
-                <input style="background-color: orange;" type="checkbox" id="titleVisible" name="titleVisible" checked onclick="handleTitleVisibleClick()" style="margin-left: 16px;" />
-                <label for="titleVisible">Title</label>
-            </span>
-      </div>
-
-      <div>
-        <span>
-            <input type="checkbox" id="legendVisible" name="legendVisible" checked onclick="handleLegendVisibleClick()" />
-            <label for="legendVisible">Legend</label>
-        </span>
-      </div>
-
-      <div>
-        <span>
-            <input type="checkbox" id="datex" name="datex"  onclick="handleDatexAxisClick()" />
-            <label for="datex">Date X-axis</label>
-        </span>
-      </div>
-
-      <div></div>
-
-
+        <div class="btn-group">
+            <button onclick="handleChart()">Chart</button>
+            <button onclick="handleStats()">Stats</button>
+        </div>
     </div>
 
-    <!-- <div id="chartHolder" class="chartHolder" style="height: calc(100%-60px); position: relative; width:95vw"> -->
-    <div id="chartHolder" class="chartHolder" style="height: 94vh; position: relative; width:95vw">
-        <canvas id="myChart"></canvas>
-    </div>
-
-    <div class="container" style="background-color: orange;" id="tooltip"></div>
 </body>
 </html>

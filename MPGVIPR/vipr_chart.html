@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title id="title">Villages Internal Pickleball Rating</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?xml version="1.0" encoding="utf-8" ?>
+
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- <script src="js/chart.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script> -->
+
+    <!-- <script src="js/chartjs-adapter-date-fns"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script> -->
+
+    <script src="js/vipr_chart.js"></script>
+
+<style>
+
+    .container {
+      display: grid;
+      grid-template-columns: 0.8fr 1.8fr repeat(3, 0.7fr, 0.5fr);
+      gap: 2px;
+      background-color: aliceblue;
+      width: 400px;
+    }
+
+    .name_holder {
+      text-align: right;
+      padding-right: 10px;
+    }
+
+    .data_holder {
+      text-align: center;
+    }
+
+    .score_holder {
+      text-align: center;
+      margin-top: -1em;
+    }
+
+    .full_row {
+      grid-column-start: 1;
+      grid-column-end: 7;
+      text-align: center;
+      padding: 3px;
+    }
+
+    .settings_holder {
+      color: black;
+      background-color: orange;
+      opacity: 1;
+    }
+
+  </style>
+
+</head>
+
+<body onload="handleOnLoad()"> <!-- height:100%"> -->
+
+    <!-- Settings-->
+    <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">
+      <div></div>  
+
+      <div>
+        <span>
+          <input type="checkbox" id="stepped" name="stepped" checked onclick="handleSteppedClick()" />
+          <label for="stepped">Stepped</label>
+        </span>
+      </div>
+
+      <div>
+            <span">
+                <input style="background-color: orange;" type="checkbox" id="titleVisible" name="titleVisible" checked onclick="handleTitleVisibleClick()" style="margin-left: 16px;" />
+                <label for="titleVisible">Title</label>
+            </span>
+      </div>
+
+      <div>
+        <span>
+            <input type="checkbox" id="legendVisible" name="legendVisible" checked onclick="handleLegendVisibleClick()" />
+            <label for="legendVisible">Legend</label>
+        </span>
+      </div>
+
+      <div>
+        <span>
+            <input type="checkbox" id="datex" name="datex" onclick="handleDatexAxisClick()" />
+            <label for="datex">Date X-axis</label>
+        </span>
+      </div>
+
+      <div></div>
+
+
+    </div>
+
+    <!-- <div id="chartHolder" class="chartHolder" style="height: calc(100%-60px); position: relative; width:95vw"> -->
+    <div id="chartHolder" class="chartHolder" style="height: 94vh; position: relative; width:95vw">
+        <canvas id="chartCanvas"></canvas>
+    </div>
+
+    <div class="container" style="background-color: orange;" id="tooltip"></div>
+</body>
+</html>
