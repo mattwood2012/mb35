@@ -118,7 +118,7 @@ async function handleOnLoad() {
   resultsText.push(`
 <div class="results-game-info">Date: ${gr.match_date} Match: ${gr.match_id} Game: ${gr.game_number}</div>
 <div class="results-container">
-  <div style="text-align:right">Players (VIPR):&nbsp;</div>
+  <div style="text-align:right background: linear-gradient(180deg, #fff7ed 0%, #fff7ed 100%)">Players (VIPR):&nbsp;</div>
   <div style="text-align:center">Team &Delta; R</div>
   <div style="text-align:center">Score</div>
   <div style="text-align:center">Change in R</div>

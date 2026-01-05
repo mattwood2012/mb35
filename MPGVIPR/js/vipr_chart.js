@@ -105,42 +105,32 @@ async function handleOnLoad() {
         let innerHTML = `
         <div class="full_row">Date: ${context.match_date}, Match: ${context.match_id.substr(context.match_id.length-4)}, Game: ${context.game_number}</div>
         
-        <div></div>
-        <div class="name_holder">Players</div>
-        <div class="data_holder">Before</div>
-        <div class="data_holder">After</div>
-        <div class="data_holder">Delta</div>
-        <div class="data_holder">Score</div>
+        <div class="player-header">Players</div>
+        <div class="centered-header">Before</div>
+        <div class="centered-header">Team &Delta;</div>
+        <div class="score-header">Score</div>
+        <div class="centered-header">After</div>
 
-        <div class="name_holder">Visitor&nbsp;1:</div>
-        <div class="name_holder">${context.visitor1_name}</div>
-        <div class="data_holder">${context.visitor1_rating_before.toFixed(3)}</div>
-        <div class="data_holder">${context.visitor1_rating_after.toFixed(3)}</div>
-        <div class="data_holder">${(context.visitor1_rating_after - context.visitor1_rating_before).toFixed(3)}</div>
-        <div></div>
+        <div class="name-holder player-holder">${context.visitor1_uid == player_uid ? "You" : context.visitor1_name}:</div>
+        <div class="data-holder">${context.visitor1_rating_before.toFixed(3)}</div>
+        <div class="changeR-visitor">${GetVisitorTeamDeltaRating(context).toFixed(3)}</div>
+        <div class="score-visitor">${(context.visitor_points)}</div>
+        <div class="data-holder">${context.visitor1_rating_after.toFixed(3)}</div>
 
-        <div class="name_holder">Visitor&nbsp;2:</div>
-        <div class="name_holder">${context.visitor2_name}</div>
-        <div class="data_holder">${context.visitor2_rating_before.toFixed(3)}</div>
-        <div class="data_holder">${context.visitor2_rating_after.toFixed(3)}</div>
-        <div class="data_holder">${(context.visitor2_rating_after - context.visitor2_rating_before).toFixed(3)}</div>
-        <div class="score_holder">${(context.visitor_points)}</div>
+        <div class="name-holder player-holder">${context.visitor2_uid == player_uid ? "You" : context.visitor2_name}:</div>
+        <div class="data-holder">${context.visitor2_rating_before.toFixed(3)}</div>
+        <div class="data-holder">${context.visitor2_rating_after.toFixed(3)}</div>
 
-        <div class="name_holder">Home&nbsp;1:</div>
-        <div class="name_holder">${context.home1_name}</div>
-        <div class="data_holder">${context.home1_rating_before.toFixed(3)}</div>
-        <div class="data_holder">${context.home1_rating_after.toFixed(3)}</div>
-        <div class="data_holder">${(context.home1_rating_after - context.home1_rating_before).toFixed(3)}</div>
-        <div></div>
+        <div class="name-holder player-holder">${context.home1_uid == player_uid ? "You" : context.home1_name}:</div>
+        <div class="data-holder">${context.home1_rating_before.toFixed(3)}</div>
+        <div class="changeR-home">${-GetVisitorTeamDeltaRating(context).toFixed(3)}</div>
+        <div class="score-home">${context.home_points}</div>
+        <div class="data-holder">${context.home1_rating_after.toFixed(3)}</div>
 
-        <div class="name_holder">Home&nbsp;2:</div>
-        <div class="name_holder">${context.home2_name}</div>
-        <div class="data_holder">${context.home2_rating_before.toFixed(3)}</div>
-        <div class="data_holder">${context.home2_rating_after.toFixed(3)}</div>
-        <div class="data_holder">${(context.home2_rating_after - context.home2_rating_before).toFixed(3)}</div>
-        <div class="score_holder">${context.home_points}</div>
-
-        <div class="full_row">crf: ${context.meta.crf}, scale: ${context.meta.scale}, curve: ${context.meta.curve}, algo_type: ${context.meta.algo_type}</div>`;
+        <div class="name-holder player-holder">${context.home2_uid == player_uid ? "You" : context.home2_name}:</div>
+        <div class="data-holder">${context.home2_rating_before.toFixed(3)}</div>
+        <div class="data-holder">${context.home2_rating_after.toFixed(3)}</div>`
+        //<div class="full_row">crf: ${context.meta.crf}, scale: ${context.meta.scale}, curve: ${context.meta.curve}, algo_type: ${context.meta.algo_type}</div>`;
 
         // Load tooltip with html formatted information about the point clicked/hovered over
         tooltipEl.innerHTML = innerHTML;
@@ -153,8 +143,13 @@ async function handleOnLoad() {
         tooltipEl.style.position = 'absolute';
 
         let left = position.left + window.pageXOffset + tooltipModel.caretX;
+        console.log(`left: ${left}, screen.width/2: ${window.screen.width / 2}`);
+        // If tooltip is on right half of screen, shift it to left side of caret
         if (left > window.screen.width / 2) {
-            left -= 400;    // 400 comes from CSS (tooltip) container class width
+            const root = document.documentElement;
+            let widthPx = getComputedStyle(root).getPropertyValue('--tooltip-width');
+            let widthNum = parseInt(widthPx.substring(0, widthPx.length - 2));
+            left -= widthNum+20; 
         }
 
         tooltipEl.style.left = left + 'px';
@@ -174,6 +169,9 @@ async function handleOnLoad() {
     
     timeData = {
         datasets: [{
+        backgroundColor: "white",
+        pointRadius: 5,
+        pointHoverRadius: 7,
         label: playerName,
         borderColor: "rgb(247,136,47)",
         pointBackgroundColor: "rgb(247,136,47)",
@@ -184,6 +182,9 @@ async function handleOnLoad() {
     
     linearData = {
         datasets: [{
+        backgroundColor: "#ffffff",
+        pointRadius: 5,
+        pointHoverRadius: 7,
         label: playerName,
         borderColor: "rgb(247,136,47)",
         pointBackgroundColor: "rgb(247,136,47)",
@@ -326,5 +327,23 @@ function GetY(ar, player_uid) {
         return ar.home2_rating_after;
     } else {
         return null;
+    }
+}
+
+function GetVisitorTeamDeltaRating(context) {
+    // Calculates the combined VIPR difference in VIPR rating for a team based on individual player VIPR ratings and a CRF
+    {
+        let visitorCombinedRating = GetCombinedRating(context.visitor1_rating_before, context.visitor2_rating_before, context.meta.crf);
+        let homeCombinedRating = GetCombinedRating(context.home1_rating_before, context.home2_rating_before, context.meta.crf);
+        
+        return visitorCombinedRating - homeCombinedRating;
+    }
+}
+
+function GetCombinedRating(player1VIPR, player2VIPR, crf) {
+    // Calculates the combined VIPR rating for a team based on individual player VIPR ratings and a CRF
+    {
+        const average = (player1VIPR + player2VIPR) / 2.0;
+        return average - (average - Math.min(player1VIPR, player2VIPR)) * crf;
     }
 }
