@@ -1,6 +1,6 @@
 "use strict";
 const version = " V0.1";
-var player_uid = "c459812410f5cd9bda326c26"; // Use Jim as default but override if mens league
+var player_uid;
 
 async function handleOnLoad() {
 
@@ -39,15 +39,24 @@ async function handleOnLoad() {
     // Read query string parameters
     const params = new URLSearchParams(window.location.search);
     const league = params.get('league'); // mens or pyp
-    player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26";
-    const hash = params.get('hash'); // Hash of top secret password
+    
+    if (!isParamValid(league)) {
+        league == "mens";
+    }
 
+    // Get player uid and if no valid uid passed in query string use Mike for mens and Jim for pyp
+    player_uid = params.get("uid");
+    if (!isParamValid(player_uid)) {
+        player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
+    }
+    
     // Use sanitized data if no password
     let resultsFilename;
-    if (hash == "null") {
-        resultsFilename = `ViprAlgoResults_${league}_sanitized.json`;
-    } else {
+    const hash = params.get('hash'); // Hash of top secret password
+    if (isParamValid(hash)) {
         resultsFilename = `${hash}_${league}.json`;
+    } else {
+        resultsFilename = `ViprAlgoResults_${league}_sanitized.json`;
     }
 
     // Real code will just gets back match results for selected player but for now extract it from all data
@@ -288,4 +297,9 @@ function GetPartnerLabel(teamLabel,playerLabel) {
 function combined_rating(rating_p1, rating_p2, crf) {
     let ave_rating = (rating_p1 + rating_p2) / 2.0;
     return ave_rating - (ave_rating - Math.min(rating_p1, rating_p2)) * crf / 100.0;
+}
+
+// Check that a query string parameter is valid (not null, undefined or empty)
+function isParamValid(param) {
+    return param !== null && param !== undefined && param !== "";
 }

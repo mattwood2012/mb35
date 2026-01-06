@@ -1,7 +1,7 @@
 // Globals
 "use strict";
 const version = " V0.1";
-var player_uid; //"49d40ef4a000349ccbc15c5e"; //"c459812410f5cd9bda326c26";
+var player_uid; //"49d40ef4a000349ccbc15c5e"; //"c459812410f5cd9bda326c26"; // 
 
 var algoResults;
 var ctcb;   // Custom Tooltip Call Back
@@ -26,20 +26,27 @@ async function handleOnLoad() {
     
     // Read query string parameters
     let league;
-    let hash
+    let hash;
     const params = new URLSearchParams(window.location.search);
     league = params.get('league'); // mens or pyp
-    if (league == null) league = "mens";
 
-    player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26";
-    
-    hash = params.get('hash'); // Hash of top secret password
+    if (!isParamValid(league)) {
+        league == "mens";
+    }
 
+    // Get player uid and if no valid uid passed in query string use Mike for mens and Jim for pyp
+    player_uid = params.get("uid");
+    if (!isParamValid(player_uid)) {
+        player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
+    }
+
+    // Determine results filename to use based on hash parameter
     let resultsFilename;
-    if (hash == "null" || hash == null || hash == "" || hash == "undefined") {
-        resultsFilename = `ViprAlgoResults_${league}_sanitized.json`;
-    } else {
+    hash = params.get("hash"); // Hash of top secret password
+    if (isParamValid(hash)) {
         resultsFilename = `${hash}_${league}.json`;
+    } else {
+        resultsFilename = `ViprAlgoResults_${league}_sanitized.json`;
     }
 
     // Real code will just gets back match results for selected player but for now extract it from all data
@@ -53,7 +60,7 @@ async function handleOnLoad() {
         return;
     }
 
-    // Create an array of results and time/sequential plot data for the games player played in 
+    // Create an array of results and time/sequential plot data for the games player_uid played in 
     let x = 1;
     let y;
 
@@ -275,7 +282,7 @@ function handleDatexAxisClick() {
         chart = new Chart(ctx, linearConfig);
     }
 
-    //chart.update();
+    // Using U/I settings to set chart options
     handleSteppedClick();
     handleLegendVisibleClick();
     handleTitleVisibleClick();
@@ -330,8 +337,8 @@ function GetY(ar, player_uid) {
     }
 }
 
+// Calculates the combined VIPR difference in VIPR rating for a team based on individual player VIPR ratings and a CRF (used in creating tooltip)
 function GetVisitorTeamDeltaRating(context) {
-    // Calculates the combined VIPR difference in VIPR rating for a team based on individual player VIPR ratings and a CRF
     {
         let visitorCombinedRating = GetCombinedRating(context.visitor1_rating_before, context.visitor2_rating_before, context.meta.crf);
         let homeCombinedRating = GetCombinedRating(context.home1_rating_before, context.home2_rating_before, context.meta.crf);
@@ -340,10 +347,16 @@ function GetVisitorTeamDeltaRating(context) {
     }
 }
 
+// Calculates the combined VIPR rating for a team based on individual player VIPR ratings and a CRF (used by GetVisitorTeamDeltaRating)
 function GetCombinedRating(player1VIPR, player2VIPR, crf) {
-    // Calculates the combined VIPR rating for a team based on individual player VIPR ratings and a CRF
     {
         const average = (player1VIPR + player2VIPR) / 2.0;
         return average - (average - Math.min(player1VIPR, player2VIPR)) * crf;
     }
 }
+
+// Check that a query string parameter is valid (not null, undefined or empty)
+function isParamValid(param) {
+    return param !== null && param !== undefined && param !== "";
+}
+
