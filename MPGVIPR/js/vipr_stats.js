@@ -5,7 +5,7 @@ var player_uid;
 async function handleOnLoad() {
 
     // Participants labels
-    let playerName;
+    let playerName = "";
     let partnerLabel;
     let teamLabel;
     let otherTeamLabel;
@@ -38,18 +38,17 @@ async function handleOnLoad() {
 
     // Read query string parameters
     const params = new URLSearchParams(window.location.search);
-    const league = params.get('league'); // mens or pyp
+    let league = params.get('league'); // mens or pyp
     
     if (!isParamValid(league)) {
-        league == "mens";
+        league = "mens";
     }
 
     // Get player uid and if no valid uid passed in query string use Mike for mens and Jim for pyp
     player_uid = params.get("uid");
     if (!isParamValid(player_uid)) {
-        player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
+        player_uid = (league == "mens") ? "X49d40ef4a000349ccbc15c5e" : "Xc459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
     }
-    
     // Use sanitized data if no password
     let resultsFilename;
     const hash = params.get('hash'); // Hash of top secret password
@@ -58,6 +57,8 @@ async function handleOnLoad() {
     } else {
         resultsFilename = `ViprAlgoResults_${league}_sanitized.json`;
     }
+
+    const leagueName = (league == "mens") ? "Men's League" : "Mixed PYP League"; // Change to object
 
     // Real code will just gets back match results for selected player but for now extract it from all data
     // First read the results document (players names, before and after ratings etc.)
@@ -73,7 +74,7 @@ async function handleOnLoad() {
         if ( playerLabel && (gr.winner != "tie")) {
           totalGames++;
 
-          playerName = gr[playerLabel+ "_name"];
+          if (playerName == "") playerName = gr[playerLabel+ "_name"];
 
           // Get if player is home of visitor
           teamLabel = playerLabel.substring(0, playerLabel.length-1);
@@ -123,23 +124,23 @@ async function handleOnLoad() {
 
           let changeInR = gr[playerLabel + "_rating_after"] - gr[playerLabel + "_rating_before"]
           
-          // Create game results
+  // Create and save one game results
   resultsText.push(`
-<div class="results-game-info">Date: ${gr.match_date} Match: ${gr.match_id} Game: ${gr.game_number}</div>
-<div class="results-container">
-  <div style="text-align:right background: linear-gradient(180deg, #fff7ed 0%, #fff7ed 100%)">Players (VIPR):&nbsp;</div>
-  <div style="text-align:center">Team &Delta; R</div>
-  <div style="text-align:center">Score</div>
-  <div style="text-align:center">Change in R</div>
-  <div class="results-names">You (${playerRatingBefore.toFixed(3)}) / ${gr[partnerLabel + "_name"]} (${partnerRatingBefore.toFixed(3)}):&nbsp;</div>
-  <div class="results-cr-delta">${(playerTeamCombinedDeltaRating).toFixed(3)}</div>
-  <div class="results-scores">${gr[teamLabel+"_points"]}</div>
-  <div class="results-scores">${changeInR.toFixed(3)}</div>
-  <div class="results-names">${gr[otherTeamLabel + "1_name"]} (${otherTeamPlayer1Before.toFixed(3)}) / ${gr[otherTeamLabel + "2_name"]} (${otherTeamPlayer2Before.toFixed(3)}):&nbsp;</div>
-  <div class="results-cr-delta">${(-playerTeamCombinedDeltaRating).toFixed(3)}</div>
-  <div class="results-scores">${gr[otherTeamLabel+"_points"]}</div>
-  <div class="results-scores">${-changeInR.toFixed(3)}</div>
-</div>`);
+  <div class="results-game-info">Date: ${gr.match_date} Match: ${gr.match_id.slice(-4)} Game: ${gr.game_number}</div>
+  <div class="results-container">
+    <div class="results-header" style="text-align: right">Players (VIPR): </div>
+    <div class="results-header">Team&nbsp;&Delta;&nbsp;R</div>
+    <div class="results-header">Score</div>
+    <div class="results-header">R&nbsp;Change</div>
+    <div class="results-names" style="text-align: right">You (${playerRatingBefore.toFixed(3)}) / ${gr[partnerLabel + "_name"]} (${partnerRatingBefore.toFixed(3)}):&nbsp;</div>
+    <div class="results-cr-delta">${formatSigned(playerTeamCombinedDeltaRating)}</div>
+    <div class="results-scores">${gr[teamLabel+"_points"]}</div>
+    <div class="results-scores">${formatSigned(changeInR)}</div>
+    <div class="results-names" style="text-align: right">${gr[otherTeamLabel + "1_name"]} (${otherTeamPlayer1Before.toFixed(3)}) / ${gr[otherTeamLabel + "2_name"]} (${otherTeamPlayer2Before.toFixed(3)}):&nbsp;</div>
+    <div class="results-cr-delta">${formatSigned(-playerTeamCombinedDeltaRating)}</div>
+    <div class="results-scores">${gr[otherTeamLabel+"_points"]}</div>
+    <div class="results-scores">${formatSigned(-changeInR)}</div>
+  </div>`);
 
         }
     })
@@ -166,7 +167,7 @@ async function handleOnLoad() {
           // Only create best game message if player won and combined rating delta is lowest
           if ((gr.winner == bestTeamLabel) && (gr["playerTeamCombinedDeltaRating"] <= bestMinPlayerTeamCombinedRating)) {
             bestGameMessage = `On ${gr.match_date} you and ${gr[bestPartnerLabel + "_name"]} beat ${gr[bestOtherTeamLabel + "1_name"]} and ${gr[bestOtherTeamLabel + "2_name"]}`;
-            bestGameMessage += ` ${gr[bestTeamLabel+"_points"]}-${gr[bestOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${gr["playerTeamCombinedDeltaRating"].toFixed(3)}`;
+            bestGameMessage += ` ${gr[bestTeamLabel+"_points"]}-${gr[bestOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${formatSigned(gr["playerTeamCombinedDeltaRating"])}`;
             bestMinPlayerTeamCombinedRating = gr["playerTeamCombinedDeltaRating"];
           }
         }
@@ -190,7 +191,7 @@ async function handleOnLoad() {
           // Only create worst game message if player lost and combined rating delta is highest
           if ((gr.loser == worstTeamLabel) && (gr["playerTeamCombinedDeltaRating"] >= worstMaxPlayerTeamCombinedRating)) {
             worstGameMessage = `On ${gr.match_date} you and ${gr[worstPartnerLabel + "_name"]} lost to ${gr[worstOtherTeamLabel + "1_name"]} and ${gr[worstOtherTeamLabel + "2_name"]}`;
-            worstGameMessage += ` ${gr[worstTeamLabel+"_points"]}-${gr[worstOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${gr["playerTeamCombinedDeltaRating"].toFixed(3)}`;
+            worstGameMessage += ` ${gr[worstTeamLabel+"_points"]}-${gr[worstOtherTeamLabel+"_points"]} with a difference in team combined VIPR rating of ${formatSigned(gr["playerTeamCombinedDeltaRating"])}`;
             worstMaxPlayerTeamCombinedRating = gr["playerTeamCombinedDeltaRating"];
           }
         }
@@ -200,68 +201,51 @@ async function handleOnLoad() {
     worstGameMessage = "You didn't lose any games"
   }
 
-    let innerHTML = `<div class="title">${playerName}</div>
-<!-- Stats table -->
-<div class="sub-title">Statistics</h2>
+  // Deal with no results for selected player
+  if (playerName == "") {
+    let innerHTML = `<div class="page">
+    <div class="title">Selected player is not in ${leagueName}</div>`
+    document.getElementById("body").innerHTML = innerHTML;
+    return;
+  }
 
-<div class="stats-container">
-  <div class="stats-description">Total games played</div>
-  <div class="stats-value">${totalGames}</div>
+  // Create stats HTML
+    let innerHTML = `
+<div class="page">
+  <div class="title">${playerName == "" ? `Selected player is not in ${leagueName}` : `${leagueName}: ${playerName}`}</div>
+  <!-- Stats table -->
+  <div class="sub-title">Statistics</div>
 
-  <div class="stats-description">Games won</div>
-  <div class="stats-value">${gamesWon}</div>
+  <div class="card stats-container">
+    <div class="stats-description">Total games played</div><div class="stats-value">${totalGames}</div>
+    <div class="stats-description">Games won</div><div class="stats-value">${gamesWon}</div>
+    <div class="stats-description">Games lost</div><div class="stats-value">${gamesLost}</div>
+    <div class="stats-description">Games tied</div><div class="stats-value">${gamesTied}</div>
+    <div class="stats-description">Total points for</div><div class="stats-value">${totalPointsFor}</div>
+    <div class="stats-description">Total points against</div><div class="stats-value">${totalPointsAgainst}</div>
+    <div class="stats-description">Current VIPR rating</div><div class="stats-value">${currentViprRating.toFixed(3)}</div>
+    <div class="stats-description">Min VIPR rating</div><div class="stats-value">${minViprRating.toFixed(3)}</div>
+    <div class="stats-description">Max VIPR rating</div><div class="stats-value">${maxViprRating.toFixed(3)}</div>
+    <div class="stats-description">Average VIPR rating</div><div class="stats-value">${(accumulatedViprRating / totalGames).toFixed(3)}</div>
+    <div class="stats-description">Min team VIPR rating delta</div><div class="stats-value">${formatSigned(minDeltaViprRating)}</div>
+    <div class="stats-description">Max team VIPR rating delta</div><div class="stats-value">${formatSigned(maxDeltaViprRating)}</div>
+    <div class="stats-description">Average team VIPR rating delta</div><div class="stats-value">${formatSigned(accumulatedDeltaViprRating / totalGames)}</div>
+    <div class="stats-description">Longest winning streak</div><div class="stats-value">${maxWinStreak}</div>
+    <div class="stats-description">Longest losing streak</div><div class="stats-value">${maxLossStreak}</div>
+  </div>
 
-  <div class="stats-description">Games lost</div>
-  <div class="stats-value">${gamesLost}</div>
-
-  <div class="stats-description">Games tied</div>
-  <div class="stats-value">${gamesTied}</div>
-
-  <div class="stats-description">Total points for</div>
-  <div class="stats-value">${totalPointsFor}</div>
-
-  <div class="stats-description">Total points against</div>
-  <div class="stats-value">${totalPointsAgainst}</div>
-
-  <div class="stats-description">Current VIPR rating</div>
-  <div class="stats-value">${currentViprRating.toFixed(3)}</div>
-
-  <div class="stats-description">Min VIPR rating</div>
-  <div class="stats-value">${minViprRating.toFixed(3)}</div>
-
-  <div class="stats-description">Max VIPR rating</div>
-  <div class="stats-value">${maxViprRating.toFixed(3)}</div>
-
-  <div class="stats-description">Average VIPR rating</div>
-  <div class="stats-value">${(accumulatedViprRating / totalGames).toFixed(3)}</div>
-
-  <div class="stats-description">Min team VIPR rating delta</div>
-  <div class="stats-value">${minDeltaViprRating.toFixed(3)}</div>
-
-  <div class="stats-description">Max team VIPR rating delta</div>
-  <div class="stats-value">${maxDeltaViprRating.toFixed(3)}</div>
-
-  <div class="stats-description">Average team VIPR rating delta</div>
-  <div class="stats-value">${(accumulatedDeltaViprRating / totalGames).toFixed(3)}</div>
-
-  <div class="stats-description">Longest winning streak</div>
-  <div class="stats-value">${maxWinStreak}</div>
-
-  <div class="stats-description">Longest losing streak</div>
-  <div class="stats-value">${maxLossStreak}</div>
-
+  <!-- Hilite and lolite -->
+  <div class="sub-title">Highlights and Lowlights</div>
+  <div class="card">
+    <div class="highlight-label">Best Game:</div>
+    <div class="highlight-message">${bestGameMessage}</div>
+    <div class="highlight-label">Worst Game:</div>
+    <div class="highlight-message">${worstGameMessage}</div>
+  </div>
 </div>
-
-<!-- Hilite and lolite -->
-<div class="sub-title">Highlights and Lowlights</div>
-
-<div class="highlite-message" style="font-size: 24px; margin-top: 8px; border: 0px;">Best Game:</div>
-<div class="highlite-message" style=" padding: 4px">${bestGameMessage}</div>
-<div class="highlite-message" style="font-size: 24px; margin-top: 8px; border: 0px;">Worst Game:</div>
-<div class="highlite-message" style=" padding: 4px">${worstGameMessage}</div>
 `;
 
-let resultHTMLHeader = `<div class="sub-title">Game Results</div>`;
+let resultHTMLHeader = `  <div class="sub-title">Game Results</div>`;
 
   for (let i=0; i<resultsText.length; i++) {
     resultHTMLHeader += resultsText[i];
@@ -302,4 +286,10 @@ function combined_rating(rating_p1, rating_p2, crf) {
 // Check that a query string parameter is valid (not null, undefined or empty)
 function isParamValid(param) {
     return param !== null && param !== undefined && param !== "";
+}
+
+// Force a + in front of numbers > 0
+function formatSigned(n) {
+    const sign = n < 0 ? "" : "+";
+    return sign + n.toFixed(3);
 }

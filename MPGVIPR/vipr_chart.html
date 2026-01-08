@@ -40,6 +40,17 @@
     overflow: hidden;
   }
 
+  .title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--orange-dark);
+    text-align: center;
+    margin-bottom: 10px;
+    width: 90%;
+    margin: 0 auto; 
+    text-align: center;
+  }
+
   /* ===== SETTINGS BAR ===== */
   .settings_holder {
     background: linear-gradient(180deg, var(--orange-main), var(--orange-main));
@@ -183,7 +194,7 @@
 
 </head>
 
-<body onload="handleOnLoad()">
+<body id="body" onload="handleOnLoad()">
 
     <!-- Settings-->
     <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 120px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">

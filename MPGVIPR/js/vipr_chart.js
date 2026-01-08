@@ -10,7 +10,7 @@ const contexts = [];    // Holds meta data (partner, opponents, scores etc.) tha
 
 var chart;
 var ctx
-var playerName;
+var playerName = "";
 
 var timeDataArray = [];
 var linearDataArray = [];
@@ -33,6 +33,8 @@ async function handleOnLoad() {
     if (!isParamValid(league)) {
         league == "mens";
     }
+
+    const leagueName = (league == "mens") ? "Men's League" : "Mixed PYP League"; // Change to object
 
     // Get player uid and if no valid uid passed in query string use Mike for mens and Jim for pyp
     player_uid = params.get("uid");
@@ -150,7 +152,6 @@ async function handleOnLoad() {
         tooltipEl.style.position = 'absolute';
 
         let left = position.left + window.pageXOffset + tooltipModel.caretX;
-        console.log(`left: ${left}, screen.width/2: ${window.screen.width / 2}`);
         // If tooltip is on right half of screen, shift it to left side of caret
         if (left > window.screen.width / 2) {
             const root = document.documentElement;
@@ -173,13 +174,20 @@ async function handleOnLoad() {
     const titleText = document.getElementById("title").innerText + version;
     const isTitleVisible = document.getElementById("titleVisible").checked;
     const isLegendVisible = document.getElementById("legendVisible").checked;
+
+    if (playerName == "") {
+        let innerHTML = `<div class="page">
+        <div class="title">Selected player is not in ${leagueName}</div>`
+        document.getElementById("body").innerHTML = innerHTML;
+        return;
+    }
     
     timeData = {
         datasets: [{
         backgroundColor: "white",
         pointRadius: 5,
         pointHoverRadius: 7,
-        label: playerName,
+        label: `${leagueName}: ${playerName}`,
         borderColor: "rgb(247,136,47)",
         pointBackgroundColor: "rgb(247,136,47)",
         backgroundColor: "rgb(247,136,47)",
@@ -192,7 +200,7 @@ async function handleOnLoad() {
         backgroundColor: "#ffffff",
         pointRadius: 5,
         pointHoverRadius: 7,
-        label: playerName,
+        label: `${leagueName}: ${playerName}`,
         borderColor: "rgb(247,136,47)",
         pointBackgroundColor: "rgb(247,136,47)",
         backgroundColor: "rgb(247,136,47)",
@@ -321,16 +329,16 @@ function handleTitleVisibleClick() {
 function GetY(ar, player_uid) {
 
     if (ar.visitor1_uid == player_uid) {
-        playerName = ar.visitor1_name;
+        if (playerName =="") playerName = ar.visitor1_name;
         return ar.visitor1_rating_after;
     } else if (ar.visitor2_uid == player_uid) {
-        playerName = ar.visitor2_name;
+        if (playerName =="") playerName = ar.visitor2_name;
         return ar.visitor2_rating_after;
     } else if (ar.home1_uid == player_uid) {
-        playerName = ar.home1_name;
+        if (playerName =="") playerName = ar.home1_name;
         return ar.home1_rating_after;
     } else if (ar.home2_uid == player_uid) {
-        playerName = ar.home2_name;
+        if (playerName =="") playerName = ar.home2_name;
         return ar.home2_rating_after;
     } else {
         return null;
