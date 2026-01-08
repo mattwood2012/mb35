@@ -177,7 +177,7 @@ async function handleOnLoad() {
 
     if (playerName == "") {
         let innerHTML = `<div class="page">
-        <div class="title">Selected player is not in ${leagueName}</div>`
+        <div class="title">The selected player has not played a game in ${leagueName}</div>`
         document.getElementById("body").innerHTML = innerHTML;
         return;
     }

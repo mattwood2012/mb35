@@ -47,7 +47,7 @@ async function handleOnLoad() {
     // Get player uid and if no valid uid passed in query string use Mike for mens and Jim for pyp
     player_uid = params.get("uid");
     if (!isParamValid(player_uid)) {
-        player_uid = (league == "mens") ? "X49d40ef4a000349ccbc15c5e" : "Xc459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
+        player_uid = (league == "mens") ? "49d40ef4a000349ccbc15c5e" : "c459812410f5cd9bda326c26"; // "6f5fa0b8cb58111847cb83c4"
     }
     // Use sanitized data if no password
     let resultsFilename;
@@ -204,7 +204,7 @@ async function handleOnLoad() {
   // Deal with no results for selected player
   if (playerName == "") {
     let innerHTML = `<div class="page">
-    <div class="title">Selected player is not in ${leagueName}</div>`
+    <div class="title">The selected player has not played a game in ${leagueName}</div>`
     document.getElementById("body").innerHTML = innerHTML;
     return;
   }
@@ -212,7 +212,7 @@ async function handleOnLoad() {
   // Create stats HTML
     let innerHTML = `
 <div class="page">
-  <div class="title">${playerName == "" ? `Selected player is not in ${leagueName}` : `${leagueName}: ${playerName}`}</div>
+  <div class="title">${leagueName}: ${playerName}</div>
   <!-- Stats table -->
   <div class="sub-title">Statistics</div>
 
