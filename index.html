@@ -101,20 +101,20 @@
             const oneWeekMS = 7 * 24 * 60 * 60 * 1000;
 
             const knownClinicYear = 2026;
-            const knownClinicMonth = 0;      // Note month index is zero based
+            const knownClinicMonth = 1;
             const knownClinicDay = 14;
 
-            const knownLessonIndex = 3;      // Note lesson index is zero based
+            const knownLessonIndex = 4;      // Note lesson index is zero based
 
             window.onload = function() {
                 // Convert last known clinic date to epoch milliSeconds 
-                let knownClinicDate = new Date(knownClinicYear, knownClinicMonth, knownClinicDay, 12)
+                let knownClinicDate = new Date(knownClinicYear, knownClinicMonth - 1, knownClinicDay, 12)
                 let clinicDateMS = knownClinicDate.valueOf();
 
                 // Get current date in epoch milliSeconds
                 let nowMS = Date.now();
 
-                let lessonIndex = knownLessonIndex;
+                let lessonIndex = knownLessonIndex - 1;
 
                 // If date is before know clinic date use clinicDateMS otherwise add a week to clinicDateMS, increment lessonIndex and try again
                 while (nowMS > clinicDateMS) {
