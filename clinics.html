@@ -5,33 +5,72 @@
         <title>Moving Beyond 3.5</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
-        <style>
-            .title {
-                font-size: 28px;
-                font-weight: bold;
-                padding: 5px;
-                margin-top: 20px;
-                text-align: center;
-            }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        color: #333;
+        line-height: 1.6;
+    }
 
-            .sub-title {
-                font-size: 22px;
-                font-weight: bold;
-                padding: 5px;
-                margin-top: 14px;
-                text-align: center;
-            }
+    /* Header */
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(to right, #6FA1D6, #8BB7E0);
+        color: white;
+        border-bottom: 4px solid #5A8EC0;
+    }
 
-            .goHomeButton {
-                display:block;
-                margin: 0 auto;
-                font-size: 18px;
-                padding: 5px;
-                background-color: blue;
-                color: white;
-                border-color: blue;
-            }
-        </style>
+    /* Subtitle */
+    .sub-title {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 25px;
+        color: #6FA1D6;
+    }
+
+    /* Content Card */
+    .content-card {
+        max-width: 700px;
+        margin: 25px auto;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        font-size: 17px;
+    }
+
+    .clinic-item {
+        margin-bottom: 12px;
+        padding: 10px 14px;
+        background: #eef4fb;
+        border-left: 4px solid #6FA1D6;
+        border-radius: 6px;
+    }
+
+    /* Button */
+    .goHomeButton {
+        display: block;
+        margin: 30px auto;
+        font-size: 18px;
+        padding: 12px 20px;
+        background-color: #6FA1D6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .goHomeButton:hover {
+        background-color: #5A8EC0;
+    }
+</style>
 
         <script>
 
@@ -57,21 +96,23 @@
 
     </head>
 
-    <body>
+<body>
 
-        <div class="title">Moving Beyond 3.5</div>
-        <div class="sub-title">List of Clinics</div>
+    <div class="title">Moving Beyond 3.5</div>
+    <div class="sub-title">List of Clinics</div>
 
-        <p id="clinic0"></p>
-        <p id="clinic1"></p>
-        <p id="clinic2"></p>
-        <p id="clinic3"></p>
-        <p id="clinic4"></p>
-        <p id="clinic5"></p>
-        <p id="clinic6"></p>
-        <p id="clinic7"></p>
+    <div class="content-card">
+        <p id="clinic0" class="clinic-item"></p>
+        <p id="clinic1" class="clinic-item"></p>
+        <p id="clinic2" class="clinic-item"></p>
+        <p id="clinic3" class="clinic-item"></p>
+        <p id="clinic4" class="clinic-item"></p>
+        <p id="clinic5" class="clinic-item"></p>
+        <p id="clinic6" class="clinic-item"></p>
+        <p id="clinic7" class="clinic-item"></p>
+    </div>
 
-        <button onclick="history.back()" class="goHomeButton">Back to the Main page</button>
+    <button onclick="history.back()" class="goHomeButton">Back to the Main page</button>
 
-    </body>
+</body>
 </html>

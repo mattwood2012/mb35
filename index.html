@@ -5,72 +5,85 @@
         <title>Moving Beyond 3.5</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <style>
-            .title {
-                font-size: 28px;
-                font-weight: bold;
-                padding: 5px;
-                margin-top: 20px;
-                text-align: center;
-            }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        color: #333;
+    }
 
-            .sub-title {
-                font-size: 22px;
-                font-weight: bold;
-                padding: 5px;
-                margin-top: 14px;
-                text-align: center;
-            }
+    /* Header Section */
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(to right, #6FA1D6, #8BB7E0);
+        color: white;
+        border-bottom: 4px solid #5A8EC0;
+    }
 
-            .clinic-description {
-                font-size: 14px;
-                font-weight: bold;
-                padding: 5px;
-                text-align: center;
-                margin-bottom: 34px; 
-            }
+    /* Clinic Info Card */
+    .info-card {
+        max-width: 600px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        text-align: center;
+    }
 
-            .link {
-                color: white;
-                font-size: 18px;
-                padding: .5em .5em;
-            }
+    .sub-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #6FA1D6;
+    }
 
-            .linkButton {
-                font-size: 18px;
-                padding: 5px;
-                margin: 10px;
-                background-color: red;
-                color: white;
-                border-color: red;
-            }
-            
-            .goToPCVGButton {
-                text-align: center;
-                font-size: 18px;
-                padding: 5px;
-                margin: 10px;
-                background-color: blue;
-                color: white;
-                border-color: blue;
-            }
+    .clinic-description {
+        font-size: 16px;
+        margin-top: 8px;
+        font-weight: 500;
+        color: #444;
+    }
 
-            .goHomeButton {
-                font-size: 18px;
-                padding: 5px;
-                margin: 10px;
-                background-color: red;
-                color: white;
-                border-color: red;
-            }
+    /* Buttons */
+    button {
+        font-size: 18px;
+        padding: 12px 18px;
+        margin: 10px auto;
+        width: 260px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: block;
+        transition: 0.2s ease;
+    }
 
-            .center {
-            display: flex;
-            justify-content: center; /* Horizontal alignment */
-            align-items: center;
-            }
+    .linkButton {
+        background-color: #6FA1D6;
+        color: white;
+    }
+    .linkButton:hover {
+        background-color: #5A8EC0;
+    }
 
-        </style>
+    .goToPCVGButton {
+        background-color: #4A78A8;
+        color: white;
+    }
+    .goToPCVGButton:hover {
+        background-color: #3C6792;
+    }
+
+    .center {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+</style>
         <script>
             const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             const monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -128,20 +141,25 @@
         </script>    
     </head>
 
-    <body>
+<body>
 
-        <div class="title">Moving Beyond 3.5</div>
-        <div class="sub-title"  id="clinicDate"></div>
+    <div class="title">Moving Beyond 3.5</div>
+
+    <div class="info-card">
+        <div class="sub-title" id="clinicDate"></div>
         <div class="clinic-description" id="clinicDescription"></div>
 
-        <div><button class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button></div>
-        <div><button class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button></div>
-        <div><button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button></div>
-        <div><button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button></div>
+        <button class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button>
+        <button class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button>
+        <button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button>
+        <button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button>
+    </div>
 
-        <div class="center"><button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button></div>
+    <div class="center">
+        <button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button>
+    </div>
 
-    </body>
+</body>
 </html>
 
 
