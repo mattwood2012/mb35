@@ -273,15 +273,16 @@ function handlePlayerChange() {
                 viprDataArray.push({x: x, y: initialVIPR});
                 initialDUPR = GetInitialDUPR(ar, player_uid);
                 duprDataArray.push({x: x++, y: initialDUPR});
-            } else {
-                yVIPR = GetVIPRy(ar, player_uid);
-                viprDataArray.push({x: x, y: yVIPR});
-                
-                yDUPR = GetDUPRy(ar, player_uid);
-                duprDataArray.push({x: x++, y: yDUPR});
-
                 contexts.push(ar);
             }
+
+            yVIPR = GetVIPRy(ar, player_uid);
+            viprDataArray.push({x: x, y: yVIPR});
+            
+            yDUPR = GetDUPRy(ar, player_uid);
+            duprDataArray.push({x: x++, y: yDUPR});
+
+            contexts.push(ar);
         }
     });
 
@@ -291,17 +292,6 @@ function handlePlayerChange() {
     chart.data.datasets[1].data = duprDataArray; 
 
     chart.update();
-
-    // return;
-
-
-    // chart.data.datasets[0].data = viprDataArray;
-    // chart.data.datasets[0].label = "fred" + " VIPR";
-
-    // chart.data.datasets[1].data = duprDataArray;
-    // chart.data.datasets[1].label = playerName + " DUPR";
-
-    // chart.update;
 
 }
 
