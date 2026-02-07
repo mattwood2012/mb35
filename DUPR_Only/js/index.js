@@ -22,7 +22,7 @@ async function getReportURL(reportURL) {
     if (pwd.value) {
         const hash = await hashString(pwd.value);
         const hashParam = `&hash=${hash.substring(0, 16)}`;
-        return reportURL + leagueParam + hashParam;
+        return reportURL + leagueParam; // + hashParam;
     } else {
         return reportURL + leagueParam;
     }
