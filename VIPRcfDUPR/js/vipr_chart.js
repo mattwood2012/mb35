@@ -1,9 +1,12 @@
 // Globals
 "use strict";
-const version = " V0.1";
-var player_uid; //"49d40ef4a000349ccbc15c5e"; //"c459812410f5cd9bda326c26"; // 
+const version = " V0.2.0";
 
-var algoResults;
+var gameResults;
+
+const nameLookup = {};
+const uidLookup = {};
+
 var ctcb;   // Custom Tooltip Call Back
 
 const contexts = [];    // Holds meta data (partner, opponents, scores etc.) that is displayed in tooltip
@@ -11,7 +14,6 @@ const contexts = [];    // Holds meta data (partner, opponents, scores etc.) tha
 var chart;
 var ctx;
 var playerName = "";
-const nameLookup = {};
 
 var viprDataArray = [];
 var duprDataArray = [];
@@ -22,49 +24,66 @@ var duprDataArray = [];
 async function handleOnLoad() {
     
     // Read query string parameters
-    // const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
+    let league = params.get('league'); // only mens85plus for now
     
-    // // Get player uid and if no valid uid passed in query string use Doug (uid=2)
-    // player_uid = params.get("uid");
-    // if (!isParamValid(player_uid)) {
-    //     player_uid = 2;
-    // }
+    if (!isParamValid(league)) {
+        league = "mens85plus";
+    }
 
-    let resultsFilename = `mens_85plus_recalc.json`;
+    // // Use sanitized data if no password
+    const leagueName = (league == "mens85plus") ? "Mens 8.5+ PYP" : "Men's League"; // Change to object
+    let resultsFilename = `${league}_sanitized.json`;
+
+    const hash = params.get('hash'); // Hash of top secret password
+    if (isParamValid(hash)) {
+        resultsFilename = `${league}_${hash}.json`;
+    }
 
     // Real code will just gets back match results for selected player but for now extract it from all data
     // First read the results document (players names, before and after ratings etc.)
     let response = await fetch("data/" + resultsFilename);
     let textResults = await response.text();
-    algoResults = JSON.parse(textResults);
+    gameResults = JSON.parse(textResults);
 
-    algoResults.forEach((ar) => {
-
-        if (! nameLookup.visitor1_uid) { nameLookup[ar.visitor1_uid] = ar.visitor1_name}
-        if (! nameLookup.visitor2_uid) { nameLookup[ar.visitor2_uid] = ar.visitor2_name}
-        if (! nameLookup.home1_uid) { nameLookup[ar.home1_uid] = ar.home1_name}
-        if (! nameLookup.home2_uid) { nameLookup[ar.home2_uid] = ar.home2_name}
+    gameResults.forEach((gr) => {
+        if (! nameLookup[gr.visitor1_uid]) {
+          nameLookup[gr.visitor1_uid] = gr.visitor1_name;
+          uidLookup[gr.visitor1_name] = gr.visitor1_uid;
+        }
+        if (! nameLookup[gr.visitor2_uid]) {
+          nameLookup[gr.visitor2_uid] = gr.visitor2_name;
+          uidLookup[gr.visitor2_name] = gr.visitor2_uid;
+        }
+        if (! nameLookup[gr.home1_uid]) {
+          nameLookup[gr.home1_uid] = gr.home1_name;
+          uidLookup[gr.home1_name] = gr.home1_uid;
+        }
+        if (! nameLookup[gr.home2_uid]) {
+          nameLookup[gr.home2_uid] = gr.home2_name;
+          uidLookup[gr.home2_name] = gr.home2_uid;
+        }
     });
 
     // Load player drop downs
-    // A blank line followed by all players in alphabetically sorted order
-    let players = Object.keys(nameLookup);
-    players.sort();
-
+    // A message line followed by all players in alphabetically sorted order
     let selectPlayer = document.getElementById("player");
 
-    // Blank first line
+    let players = Object.values(nameLookup);
+    players.sort();
+    
+    // First line: Prompt user to select a player
     let opt = document.createElement("option");
-    opt.textContent = "-- Select a Player--";
+    opt.textContent = "-- Select a Player --";
     opt.value = "";
     opt.style.color = "#cccccc"
     selectPlayer.appendChild(opt);
 
-    // Add all names after blank line
+    // Add all names in alphabetical order after prompt line
     players.forEach(function (player) {
         let opt = document.createElement("option");
-        opt.textContent = nameLookup[player];
-        opt.value = player;
+        opt.textContent = player;
+        opt.value = uidLookup[player];
         selectPlayer.appendChild(opt);
     })
 
@@ -236,9 +255,8 @@ async function handleOnLoad() {
 function handlePlayerChange() {
 
     let player_uid = document.getElementById('player').value;
-    // playerName = nameLookup[player_uid];
 
-    if (player_uid == "") {
+    if (! player_uid) {
         chart.data.datasets[0].label = "VIPR";
         chart.data.datasets[1].label = "DUPR";
         chart.data.datasets[0].data = null;
@@ -260,29 +278,29 @@ function handlePlayerChange() {
     viprDataArray = [];
     duprDataArray = [];
 
-    algoResults.forEach((ar) => {
+    gameResults.forEach((gr) => {
 
-        let playerInGame = ar.visitor1_uid == player_uid ||
-                            ar.visitor2_uid == player_uid ||
-                            ar.home1_uid == player_uid ||
-                            ar.home2_uid == player_uid;
+        let playerInGame = gr.visitor1_uid == player_uid ||
+                            gr.visitor2_uid == player_uid ||
+                            gr.home1_uid == player_uid ||
+                            gr.home2_uid == player_uid;
                             
         if ( playerInGame) {
             if (x == 0) {
-                initialVIPR = GetInitialVIPR(ar, player_uid);
+                initialVIPR = GetInitialVIPR(gr, player_uid);
                 viprDataArray.push({x: x, y: initialVIPR});
-                initialDUPR = GetInitialDUPR(ar, player_uid);
+                initialDUPR = GetInitialDUPR(gr, player_uid);
                 duprDataArray.push({x: x++, y: initialDUPR});
-                contexts.push(ar);
+                contexts.push(gr);
             }
 
-            yVIPR = GetVIPRy(ar, player_uid);
+            yVIPR = GetVIPRy(gr, player_uid);
             viprDataArray.push({x: x, y: yVIPR});
             
-            yDUPR = GetDUPRy(ar, player_uid);
+            yDUPR = GetDUPRy(gr, player_uid);
             duprDataArray.push({x: x++, y: yDUPR});
 
-            contexts.push(ar);
+            contexts.push(gr);
         }
     });
 
