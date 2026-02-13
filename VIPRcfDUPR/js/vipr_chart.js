@@ -277,6 +277,7 @@ function handlePlayerChange() {
 
     viprDataArray = [];
     duprDataArray = [];
+    contexts.length = 0;
 
     gameResults.forEach((gr) => {
 
