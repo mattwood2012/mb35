@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="stylesheet" type="text/css" href="css/stats.css">
+    <script src="js/dupr_stats.js"></script>
+    </head>
+    <body id="body" onload="handleOnLoad()">
+      <div class="title-holder">
+        <label class="title" id="leagueName" for="player" style="padding-left: 6px"></label>
+        <select class="title" name="player" id="player" onchange="handlePlayerChange()" style="margin-right: 12px; margin-bottom: 4px;"></select>
+      </div>
+      
+      <div id="stats-holder"></div>
+    </body>
+</html>

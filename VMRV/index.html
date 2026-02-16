@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title id="title">VIPR Model Results Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?xml version="1.0" encoding="utf-8" ?>
+
+    <!--<meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js" type="text/javascript"></script>
+    <!--<script src="./Chart.js" type="text/javascript"></script>-->
+    <script src="js/ViprModelResultsViewer.js" type="text/javascript"></script>
+    <!--<script src="./DinkingRankingsHistory.json"></script>-->
+
+</head>
+
+<body onload="handleOnLoad()" style="min-width: 360px; height:100%">
+
+    <style type="text/css">
+        .st0 {
+            fill-rule: evenodd;
+            clip-rule: evenodd;
+        }
+    </style>
+
+    <!-- Player 1 and Edit other settings-->
+    <div style="background-color: rgb(221,235, 247); max-height:24px; min-height: 24px; display: grid; grid-template-columns: auto 90px 180px 30px auto; width: 100%; padding-top: 6px; padding-bottom: 6px;">
+        <div></div>
+        <label for="player0">Pick a player:</label>
+        <select name="player0" id="player0" onchange="handlePlayerChange(0)" style="width: 154px;"></select>
+        <!--<img src="edit-icon.jpg" onclick="toggleSettingsVisibility()" style="height: 20px; width: 20px" />-->
+        <div onclick="toggleSettingsVisibility()" style="height: 22px; width: 22px;">
+            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 117.74 122.88" style="enable-background:new 0 0 117 123" xml:space="preserve"><g><path class="st0" d="M94.62,2c-1.46-1.36-3.14-2.09-5.02-1.99c-1.88,0-3.56,0.73-4.92,2.2L73.59,13.72l31.07,30.03l11.19-11.72 c1.36-1.36,1.88-3.14,1.88-5.02s-0.73-3.66-2.09-4.92L94.62,2L94.62,2L94.62,2z M41.44,109.58c-4.08,1.36-8.26,2.62-12.35,3.98 c-4.08,1.36-8.16,2.72-12.35,4.08c-9.73,3.14-15.07,4.92-16.22,5.23c-1.15,0.31-0.42-4.18,1.99-13.6l7.74-29.61l0.64-0.66 l30.56,30.56L41.44,109.58L41.44,109.58L41.44,109.58z M22.2,67.25l42.99-44.82l31.07,29.92L52.75,97.8L22.2,67.25L22.2,67.25z" /></g></svg>
+        </div>
+
+    </div>
+
+    <!-- Player 2, Player 3 and other settings-->
+    <div id="settings" style="max-height: 50px; min-height: 50px; grid-template-columns: auto 64px 160px 160px 160px auto; background-color: rgb(221,235, 247); display: none; width: 100%; padding-top: 6px; padding-bottom: 6px; ">
+    <div></div>
+
+
+        <!-- <label for="player1" style="padding-left: 6px">Player 2:</label> -->
+
+        <!-- <select name="player1" id="player1" onchange="handlePlayerChange(1)" style="margin-right: 12px; margin-bottom: 4px;"></select> -->
+        <div></div>
+
+        <div></div>
+
+        <div>
+            <input type="checkbox" id="stepped" name="stepped" onclick="handleSteppedClick()" />
+            <label for="stepped">Stepped</label>
+        </div>
+
+        <div>
+            <input type="checkbox" id="manualYscale" name="manualYscale" onclick="handleManualYscaleClick()" />
+            <label for="manualYscale">Manual Y scale</label>
+        </div>
+
+        <div></div>
+
+        <div></div>
+
+        <!-- <label for="player2" style="padding-left: 6px">Player 3:</label> -->
+
+        <!-- <select name="player2" id="player2" onchange="handlePlayerChange(2)" style="margin-right: 12px; margin-bottom: 4px;"></select> -->
+        <div></div>
+
+        <div></div>
+
+        <div>
+            <span>
+                <input type="checkbox" id="legendVisible" name="legendVisible" checked onclick="handleLegendVisibleClick()" />
+                <label for="legendVisible">Legend</label>
+            </span>
+            <span>
+                <input type="checkbox" id="titleVisible" name="titleVisible" checked onclick="handleTitleVisibleClick()" style="margin-left: 16px;" />
+                <label for="titleVisible">Title</label>
+            </span>
+        </div>
+
+        <!--<div>
+            <select name="lineThickness" id="lineThickness">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+            <label for="lineThickness">Line Thickness</label>
+        </div>-->
+
+        <div>
+            <label for="yfrom">From</label>
+            <input type="text" id="yfrom" name="yfrom" value="3" style="width: 30px;" oninput="handleYfromYtoInput()" />
+            <label for="yto">To</label>
+            <input type="text" id="yto" name="yto" value="6" style="width: 30px;" oninput="handleYfromYtoInput()" />
+        </div>
+
+    </div>
+
+    <div id="chartHolder" class="chartHolder" style="height: 88vh; position: relative; width:95vw">
+        <canvas id="myChart"></canvas>
+    </div>
+
+</body>
+</html>

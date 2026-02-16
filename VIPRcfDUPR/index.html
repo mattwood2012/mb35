@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <title>Load Chart or Statistics</title>
+    <script src="js/index.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            color: #d35400;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input[type="password"],
+        select {
+            width: 95%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 2px solid #f39c12;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 30%;
+            padding: 10px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            background: #e67e22;
+            /* transition: background 0.2s ease; */
+        }
+
+        button:hover {
+            background: #d35400;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Select a league then click a report type</h2>
+
+        <label for="pwd">Password (leave blank for no-name data):</label>
+        <input type="password" id="pwd" name="pwd">
+
+        <label for="leagueSelect">League:</label>
+        <select id="leagueSelect" name="leagueSelect">
+            <option value="mens85plus">Mens 8.5+ PYP</option>
+        </select>
+
+        <div class="btn-group">
+            <button onclick="handleChart()">Chart</button>
+            <button onclick="handleViprStats()">VIPR Stats</button>
+            <button onclick="handleDuprStats()">DUPR Stats</button>
+        </div>
+    </div>
+
+</body>
+</html>

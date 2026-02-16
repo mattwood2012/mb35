@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title id="title">VIPR vs DUPR Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?xml version="1.0" encoding="utf-8" ?>
+
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- <script src="js/chart.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script> -->
+
+    <!-- <script src="js/chartjs-adapter-date-fns"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script> -->
+
+    <script src="js/vipr_chart.js"></script>
+
+<style>
+  :root {
+    --orange-main: #f28c28;
+    --orange-dark: #d9731a;
+    --orange-light: #fff3e6;
+    --gray-text: #444;
+    --card-bg: #ffffff;
+    --border-soft: rgba(0, 0, 0, 0.08);
+    --tooltip-width: 360px;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, #fff7ed 0%, #fff7ed 100%);
+    /* background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%); */
+    /* background: var(--orange-main); */
+    color: var(--gray-text);
+    overflow: hidden;
+  }
+
+  .title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--orange-dark);
+    text-align: center;
+    margin-bottom: 10px;
+    width: 90%;
+    margin: 0 auto; 
+    text-align: center;
+  }
+
+  select {
+    float: right;
+  }
+
+  /* ===== SETTINGS BAR ===== */
+  .settings_holder {
+    background: linear-gradient(180deg, var(--orange-main), var(--orange-main));
+    /* background: var(--orange-main); */
+    /* background: var(--orange-light); */
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 0.95rem;
+  }
+
+  .settings_holder label {
+    cursor: pointer;
+  }
+
+  .settings_holder input[type="checkbox"] {
+    accent-color: white;
+    transform: scale(1.1);
+    margin-right: 6px;
+  }
+
+  /* ===== CHART HOLDER ===== */
+  .chartHolder {
+    /* background: white; */
+    background: --orange-light;
+    border-radius: 10px;
+    margin: 10px auto;
+    height: calc(100vh - 60px);
+    position: relative;
+    width:95vw;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* ===== TOOLTIP CONTAINER ===== */
+  .container {
+    display: grid;
+    grid-template-columns: 1.8fr 0.5fr 0.6fr 0.5fr 0.5fr;
+    gap: 4px;
+    width: var(--tooltip-width);
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-size: 0.9rem;
+  }
+
+  .full_row {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 6px;
+    background: var(--orange-light);
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--orange-dark);
+  }
+
+  .name_holder {
+    text-align: center;
+    padding-right: 10px;
+    font-weight: 500;
+      /* color: var(--orange-main); */
+}
+
+  .score-visitor {
+    text-align: center;
+    /* vertical-align: middle;
+    align-items: center; */
+    /* font-weight: bold; */
+    grid-row: 3 / span 2;
+    grid-column: 4;
+    margin-top: 0.55em;
+}
+  
+  .score-home {
+    text-align: center;
+    /* vertical-align: middle;
+    align-items: center; */
+    /* font-weight: bold; */
+    grid-row: 5 / span 2;
+    grid-column: 4;
+    margin-top: 0.55em;
+  }
+
+  .changeR-visitor {
+    text-align: center;
+    /* vertical-align: middle;
+    align-items: center; */
+    /* font-weight: bold; */
+    grid-row: 3 / span 2;
+    grid-column: 3;
+    margin-top: 0.55em;
+}
+  
+  .changeR-home {
+    text-align: center;
+    /* vertical-align: middle;
+    align-items: center; */
+    /* font-weight: bold; */
+    grid-row: 5 / span 2;
+    grid-column: 3;
+    margin-top: 0.55em;
+  }
+
+  .player-header {
+    text-align: right;
+    padding-right: 10px;
+    font-weight: 600;
+    color: var(--orange-dark);
+  }
+
+  .player-holder {
+    text-align: right;
+    padding-right: 10px;
+    font-weight: 500;
+  }
+
+  .centered-header {
+    text-align: left;
+    font-weight: 600;
+    color: var(--orange-dark);
+  }
+  .score-header {
+    text-align: center;
+    font-weight: 600;
+    color: var(--orange-dark);
+  }
+
+  .data_holder {
+    text-align: justify;
+    /* text-align: center; */
+      /* color: var(--orange-main); */
+  /* font-variant-numeric: tabular-nums; */
+  }
+  /* Column headers */
+  /* .container .data_holder:nth-child(-n + 6) {
+    font-weight: 600;
+    color: var(--orange-dark);
+  } */
+</style>
+
+
+</head>
+
+<body id="body" onload="handleOnLoad()">
+
+    <!-- Settings-->
+    <div class="settings_holder" style="display: grid; grid-template-columns: auto 100px 100px 100px 180px 120px 100px 100px auto; background-color: rgb(221,235, 247); width: 100%; padding-top: 6px; padding-bottom: 6px; ">
+      <div></div>  
+
+      <div>
+        <span>
+          <input type="checkbox" id="stepped" name="stepped" onclick="handleSteppedClick()" />
+          <label for="stepped">Stepped</label>
+        </span>
+      </div>
+
+      <div>
+        <span">
+          <input type="checkbox" id="titleVisible" name="titleVisible" checked onclick="handleTitleVisibleClick()" style="margin-left: 16px;" />
+          <label for="titleVisible">Title</label>
+        </span>
+      </div>
+
+      <div>
+        <span>
+          <input type="checkbox" id="legendVisible" name="legendVisible" checked onclick="handleLegendVisibleClick()" />
+          <label for="legendVisible">Legend</label>
+        </span>
+      </div>
+
+      <div>
+        <select name="player" id="player" onchange="handlePlayerChange()" style="margin-right: 12px; margin-bottom: 4px;"></select>
+      </div>
+      
+      <div>
+        <span>
+          <input type="checkbox" id="autoY" name="autoY" style="width: 20px;" checked onclick="handleAutoYClick()" />
+          <label for="autoY" style="width: 60px;">Auto Y-axis</label>
+        </span>
+      </div>
+
+      <div>
+        <span>
+          <label id="yMinLabel" style="width: 30px; display: none;" for="yMin">Y Min:</label>
+          <input id="yMin" type="text" name="yMin" oninput="handleAxisInput(event)" style="width: 30px; display: none;" value="4.0" />
+        </span>
+      </div>
+
+      <div>
+        <span>
+          <label id="yMaxLabel" style="width: 30px; display: none;" for="yMax">Y Max:</label>
+          <input id="yMax" type="text" name="yMax" oninput="handleAxisInput(event)" style="width: 30px; display: none;" value="5.0">
+        </span>
+      </div>
+
+      <div></div>
+
+    </div>
+
+    <div id="chartHolder" class="chartHolder">
+        <canvas id="chartCanvas"></canvas>
+    </div>
+
+    <div class="container" id="tooltip"></div>
+</body>
+</html>

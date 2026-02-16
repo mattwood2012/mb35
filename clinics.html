@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Moving Beyond 3.5</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    /* Header */
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(to right, #6FA1D6, #8BB7E0);
+        color: white;
+        border-bottom: 4px solid #5A8EC0;
+    }
+
+    /* Subtitle */
+    .sub-title {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 25px;
+        color: #6FA1D6;
+    }
+
+    /* Content Card */
+    .content-card {
+        max-width: 700px;
+        margin: 25px auto;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        font-size: 17px;
+    }
+
+    .clinic-item {
+        margin-bottom: 12px;
+        padding: 10px 14px;
+        background: #eef4fb;
+        border-left: 4px solid #6FA1D6;
+        border-radius: 6px;
+    }
+
+    /* Button */
+    .goHomeButton {
+        display: block;
+        margin: 30px auto;
+        font-size: 18px;
+        padding: 12px 20px;
+        background-color: #6FA1D6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .goHomeButton:hover {
+        background-color: #5A8EC0;
+    }
+</style>
+
+        <script>
+
+            const clinicDescriptions = [
+                "Clinic #1 - Introduction and Serve Basics",
+                "Clinic #2 - The 5 P's and Dinking Basics",
+                "Clinic #3 - Playing in Control and Return of Serve Basics",
+                "Clinic #4 - Playing the Percentages and Controlled Dinking",
+                "Clinic #5 - Concentrating, Playing Calm and Third Shot Drops and Drives",
+                "Clinic #6 - Straight Ahead Dinking, More Serves and Fourth/Fifth Shots",
+                "Clinic #7 - Equipment, Cross Court Dinking and Speedups",
+                "Clinic #8 - Confidence and Consistency by drilling"
+            ];
+
+            window.onload = function() {
+
+                for (let index = 0; index < clinicDescriptions.length; index++) {
+                    document.getElementById("clinic" + index).textContent=clinicDescriptions[index];
+                }
+
+            };            
+        </script>    
+
+    </head>
+
+<body>
+
+    <div class="title">Moving Beyond 3.5</div>
+    <div class="sub-title">List of Clinics</div>
+
+    <div class="content-card">
+        <p id="clinic0" class="clinic-item"></p>
+        <p id="clinic1" class="clinic-item"></p>
+        <p id="clinic2" class="clinic-item"></p>
+        <p id="clinic3" class="clinic-item"></p>
+        <p id="clinic4" class="clinic-item"></p>
+        <p id="clinic5" class="clinic-item"></p>
+        <p id="clinic6" class="clinic-item"></p>
+        <p id="clinic7" class="clinic-item"></p>
+    </div>
+
+    <button onclick="history.back()" class="goHomeButton">Back to the Main page</button>
+
+</body>
+</html>
