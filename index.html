@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Moving Beyond 3.5</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        color: #333;
+    }
+
+    /* Header Section */
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(to right, #6FA1D6, #8BB7E0);
+        color: white;
+        border-bottom: 4px solid #5A8EC0;
+    }
+
+    /* Clinic Info Card */
+    .info-card {
+        max-width: 600px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    .sub-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #6FA1D6;
+    }
+
+    .clinic-description {
+        font-size: 16px;
+        margin-top: 8px;
+        font-weight: 500;
+        color: #444;
+    }
+
+    /* Buttons */
+    button {
+        font-size: 18px;
+        padding: 12px 18px;
+        margin: 10px auto;
+        width: 260px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: block;
+        transition: 0.2s ease;
+    }
+
+    .linkButton {
+        background-color: #6FA1D6;
+        color: white;
+    }
+    .linkButton:hover {
+        background-color: #5A8EC0;
+    }
+
+    .goToPCVGButton {
+        background-color: #4A78A8;
+        color: white;
+    }
+    .goToPCVGButton:hover {
+        background-color: #3C6792;
+    }
+
+    .center {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+</style>
+        <script>
+            const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            const clinicDescriptions = [
+                "Clinic #1 - Introduction and Serve Basics",
+                "Clinic #2 - The 5 P's and Dinking Basics",
+                "Clinic #3 - Playing in Control and Return of Serve Basics",
+                "Clinic #4 - Playing the Percentages and Controlled Dinking",
+                "Clinic #5 - Concentrating, Playing Calm and Third Shot Drops and Drives",
+                "Clinic #6 - Straight Ahead Dinking, More Serves and Fourth/Fifth Shots",
+                "Clinic #7 - Equipment, Cross Court Dinking and Speedups",
+                "Clinic #8 - Confidence and Consistency by drilling"
+            ];
+
+            const oneWeekMS = 7 * 24 * 60 * 60 * 1000;
+
+            const knownClinicYear = 2026;
+            const knownClinicMonth = 1;
+            const knownClinicDay = 28;
+
+            const knownLessonIndex = 6;
+
+            window.onload = function() {
+                // Convert last known clinic date to epoch milliSeconds 
+                let knownClinicDate = new Date(knownClinicYear, knownClinicMonth - 1, knownClinicDay, 12)
+                let clinicDateMS = knownClinicDate.valueOf();
+
+                // Get current date in epoch milliSeconds
+                let nowMS = Date.now();
+
+                let lessonIndex = knownLessonIndex - 1;
+
+                // If date is before know clinic date use clinicDateMS otherwise add a week to clinicDateMS, increment lessonIndex and try again
+                while (nowMS > clinicDateMS) {
+                    clinicDateMS += oneWeekMS;
+                    lessonIndex++;
+                }
+
+                // Convert milliSeconds date to regular date and display
+                let nextClinicDate = new Date(clinicDateMS);
+
+                let dayStr = nextClinicDate.getDay();
+
+                // Build clinic date string and display
+                let dateString = `${dayName[nextClinicDate.getDay()]} ${monthName[nextClinicDate.getMonth()]} `;
+                dateString += `${nextClinicDate.getDate()} ${nextClinicDate.getFullYear()}`;
+                document.getElementById("clinicDate").textContent=dateString;
+
+                // Get clinic description and display
+                let descriptionString = clinicDescriptions[lessonIndex % clinicDescriptions.length];
+                document.getElementById("clinicDescription").textContent=descriptionString;
+
+            };
+
+        </script>    
+    </head>
+
+<body>
+
+    <div class="title">Moving Beyond 3.5</div>
+
+    <div class="info-card">
+        <div class="sub-title" id="clinicDate"></div>
+        <div class="clinic-description" id="clinicDescription"></div>
+
+        <button class="linkButton" onclick="document.location='./phases.html'">Five phases in a rally</button>
+        <button class="linkButton" onclick="document.location='./control.html'">Five components of playing in control</button>
+        <button class="linkButton" onclick="document.location='./percentages.html'">Playing the percentages</button>
+        <button class="linkButton" onclick="document.location='./clinics.html'">List of all clinics</button>
+    </div>
+
+    <div class="center">
+        <button class="goToPCVGButton" onclick="history.back()">Go Back to Clinic Signup</button>
+    </div>
+
+</body>
+</html>
+
+
+
